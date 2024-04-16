@@ -1,59 +1,201 @@
 // SPDX-License-Identifier: MIT 
 
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
-// import {IERC20} from "../interfaces/IERC20.sol";
+
+interface IERC20 {
+    function allowance(address owner, address spender) external view returns (uint256);
+    // function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+}
 
 pragma solidity 0.8.19;
 
 contract Employer is Context {
     uint8 public loanInterestRate;
+    
+    address public immutable cUSD;
+    bytes32 public immutable LOAN_HASH;
+    bytes32 public immutable ADVANCE_HASH;
+    bytes32 public immutable ACCEPTED_HASH;
+    bytes32 public immutable REJECTED_HASH;
 
-    // uint public generateWorkId;
+    uint public employerIds;
 
     // mapping (address => mapping(uint => bytes)) private employersPhoneMap;
     mapping (address => EmployeePayload[]) private employees;
     mapping (address => mapping (address => bool)) isAdded;
-    // EmployeePayload[] private employees;
 
+    // Mapping of employer addresses to ids
+    // mapping (address => EmployerInfo) public employerIdMap; 
+    // EmployeePayload[] private employees;
+    modifier validateEmployeeId(uint employeeId, address employer) {
+        require(employeeId < employees[employer].length, "Invalid employeeId");
+        _;
+    }
+
+    constructor (address _cUSD) {
+        if(_cUSD == address(0)) revert();
+        cUSD = _cUSD;
+        LOAN_HASH = _toHash("LOAN");
+        ADVANCE_HASH = _toHash("ADVANCE");
+        ACCEPTED_HASH = _toHash("ACCEPTED");
+        REJECTED_HASH = _toHash("REJECTED");
+    }
+
+    receive() external payable { revert(); }
+
+    function _toHash(string memory loanOrHashStr) internal pure returns(bytes32 _hash) {
+        return keccack256(abi.encode(loanOrHashStr));
+    }
+    
     function addEmployee(address[] memory addresses, uint256[] memory payments) public returns(bool done) {
-        uint addressLength = addresses.length;
         address sender = _msgSender();
+        // EmployerInfo memory info = employerIdMap[sender];
+        // if(!info.isEmployer) {
+        //     employerIds ++;
+        //     uint id = employerIds;
+        //     employerIdMap[sender] = EmployerInfo(true, id);
+        // }
+        uint addressLength = addresses.length;
         require(addressLength == payments.length, "Addresses to payment mismatch");
-        // uint workId = generateWorkId;
         for(uint8 i = 0; i < addressLength; i++) {
             address addr = addresses[i];
-            // workId += i;
             if(addr != address(0)) {
                 if(!isAdded[sender][addr]) {
                     isAdded[sender][addr] = true;
-                    employees[sender].push(EmployeePayload( addr, i, true, AdvanceRequest(0), LoanRequest(0, 0)));
+                    employees[sender].push(EmployeePayload( addr, i, true, false, payments[i], AdvanceRequest(0, AdvanceRequestStatus(0)), LoanRequest(0, 0, LoanRequestStatus(0))));
                 }
             }
         }
-        // generateWorkId = workId;
         return done;
     }
 
-    function disableEmployee(uint workId) public returns(bool) {
+    function disableOrEnableEmployee(uint employeeId, bool value) 
+        public 
+        validateEmployeeId(employeeId, _msgSender()) 
+        returns(bool) 
+    {
         address sender = _msgSender();
-        require(workId < employees[sender].length, "Invalid workId");
-        EmployeePayload memory emp = employees[sender][workId];
-        require(emp.active, "Disabled");
-        employees[sender][workId] = false;
+        EmployeePayload memory emp = employees[sender][employeeId];
+        if(value) {
+            require(!emp.active, "Enabled");
+        } else {
+            require(emp.active, "Disabled")
+        }
+        employees[sender][employeeId] = value;
 
         return true;
     }
 
-    function requestSalaryAdvance() returns(bool) {
+    function requestAdvanceOrLoan(address employerAddr, uint employeeId, uint amount, string memory loanOrAdvanceStr) 
+        public 
+        validateEmployeeId(employeeId, employerAddr) 
+        returns(bool) 
+    {
+        EmployeePayload memory pld = employees[employerAddr][employeeId];
+        string memory errorMessage = "You have pending request";
+        bool condition;
+        if(_toHash(loanOrAdvanceStr) == ADVANCE_HASH) {
+            pld.advanceReq.status == AdvanceRequestStatus.NONE;
+            require(amount <= pld.pay, "Advance cannot exceed Salary");
+            employees[employerAddr][employeeId].advanceReq = AdvanceRequest(amount, AdvanceRequestStatus.PENDING);
+        } else if(_toHash(loanOrAdvanceStr) == LOAN_HASH) {
+            pld.loanReq.status == LoanRequestStatus.NONE;
+            errorMessage = "You have pending loan request";
+            employees[employerAddr][employeeId].loanReq = LoanRequest(amount, 0, LoanRequestStatus.REQUESTED);
+        } else {
+            revert(loanOrAdvanceStr);
+        }
+        require(condition, errorMessage);
 
+        return true;
     }
 
-    function requestLoan() returns(bool) {
-
+    function approveLoanOrAdvanceRequest(uint employeeId, uint8 rate, string memory loanOrAdvanceStr) 
+        public 
+        validateEmployeeId(employeeId, _msgSender()) 
+        returns(bool) 
+    {
+        address sender = _msgSender();
+        EmployeePayload memory emp = employees[sender][employeeId];
+        require(emp.active, "Disabled");
+        const allowance = IERC20(cUSD).allowance(sender, address(this));
+        if(_toHash(loanOrAdvanceStr) == ADVANCE_HASH) {
+            require(emp.advanceReq.status == AdvanceRequestStatus.PENDING, "Invalid request");
+            employees[sender][employeeId].advanceReq = AdvanceRequest(allowance, Status.DISBURSED);
+            if(!IERC20(cUSD).transferFrom(sender, emp.identifier, allowance)) revert TransferFromFailed();
+        } else if(_toHash(loanOrAdvanceStr) == LOAN_HASH) {
+            require(emp.loanReq.status == LoanRequestStatus.REQUESTED, "Invalid request");
+            employees[sender][employeeId].loanReq = LoanRequest(
+                allowance,
+                (allowance * rate) / 100
+                Status.RESPONDED
+            );
+        } else (
+            revert (loanOrAdvanceStr);
+        )
     }
 
-    function save4Me() returns(bool) {
+    function acceptOrRejectLoanApproval(address employerAddr, uint employeeId, string memory acceptOrRejectStr) 
+        public 
+        validateEmployeeId(employeeId, employerAddr)
+        returns(bool) 
+    {
+        address sender = _msgSender();
+        EmployeePayload memory emp = employees[sender][employeeId];
+        const allowance = IERC20(cUSD).allowance(employerAddr, address(this));
+        require(sender == emp.identifier, "UnAuthorized call");
+        if(allowance > 0) {
+            if(_toHash(acceptOrRejectStr) == ACCEPTED_HASH) {
+                employees[sender][employeeId].loanReq.status = LoanRequestStatus.ACCEPTED;
+                if(!IERC20(cUSD).transferFrom(employerAddr, emp.identifier, allowance)) revert TransferFromFailed();
+            } else if(_toHash(acceptOrRejectStr) == REJECTED_HASH) {
+                delete employees[sender][employeeId].loanReq;
+            } else {
+                revert (acceptOrRejectStr);
+            }
+        } else {
+            delete employees[sender][employeeId].loanReq;
+        }
 
+        return true;
+    }
+
+    function save4Me(address employerAddr, uint employeeId, bool value)
+        validateEmployeeId(employeeId, employerAddr) 
+        returns(bool) 
+    {
+        address sender = _msgSender();
+        EmployeePayload memory emp = employees[sender][employeeId];
+        require(sender == emp.identifier, "UnAuthorized call");
+        employees[sender][employeeId].saveForMe = value;
+
+        return true;
+    }
+
+    /**@dev Employers pay employees
+     * Employees addition are not accepted at this point. 
+     * Prior to this call, employer should use { disableOrEnableEmployee } to filter ones that should not be paid
+     * Note: pay() is an atomic transaction i.e transfer to all employees must pass simultaneously.
+     *      Employers should ensure enough allowance is given to cover the pays.
+     */
+    function pay(uint employeeId, bool acceptSaveForMe) 
+        public 
+        validateEmployeeId(employeeId, _msgSender())
+        returns(bool) 
+    {
+        address sender = _msgSender();
+        const allowance = IERC20(cUSD).allowance(employerAddr, address(this));
+        EmployeePayload[] memory plds = employees[sender];
+
+        for(uint i = 0; i < plds.length; i++) {
+            EmployeePayload memory pld = plds[i];
+            require(IERC20(cUSD).transferFrom(sender, pld.identifier, pld.pay));
+        }
     }
 
 }
