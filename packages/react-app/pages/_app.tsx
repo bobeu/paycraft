@@ -11,6 +11,7 @@ import "../styles/globals.css";
 import { celo, celoAlfajores } from "wagmi/chains";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 
 const connectors = connectorsForWallets(
     [
@@ -32,13 +33,23 @@ const config = createConfig({
         [celo.id]: http(),
         [celoAlfajores.id]: http(),
     },
+    batch: {
+        multicall: true,
+        
+    }
 });
 
 const queryClient = new QueryClient();
 
+
 function App({ Component, pageProps }: AppProps) {
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+    
     return (
-        <WagmiProvider config={config}>
+        isMounted? <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider>
                     <Layout>
@@ -46,7 +57,7 @@ function App({ Component, pageProps }: AppProps) {
                     </Layout>
                 </RainbowKitProvider>
             </QueryClientProvider>
-        </WagmiProvider>
+        </WagmiProvider> : null
     );
 }
 
