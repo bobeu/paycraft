@@ -3,7 +3,7 @@
   "chainId": "44787",
   "contracts": {
     "LoanAndSalaryAdvance": {
-      "address": "0xED894c860c17E5f4f96E3715107964b5f14AbC56",
+      "address": "0x8e2b02CCD43cE8a500C012fcd533FAB2C2228502",
       "abi": [
         {
           "inputs": [
@@ -305,6 +305,111 @@
               "internalType": "struct ILoanAndSalaryAdvance.LoanRequest",
               "name": "loanReq",
               "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "employerAddr",
+              "type": "address"
+            }
+          ],
+          "name": "getEmployees",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "identifier",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "workId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "active",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "saveForMe",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "pay",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "saveForMeRate",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "amortizationRate",
+                  "type": "uint8"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amortizationAmt",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "enum ILoanAndSalaryAdvance.AdvanceRequestStatus",
+                      "name": "status",
+                      "type": "uint8"
+                    }
+                  ],
+                  "internalType": "struct ILoanAndSalaryAdvance.AdvanceRequest",
+                  "name": "advanceReq",
+                  "type": "tuple"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "uint256",
+                      "name": "amount",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "interest",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "uint256",
+                      "name": "amortizationAmt",
+                      "type": "uint256"
+                    },
+                    {
+                      "internalType": "enum ILoanAndSalaryAdvance.LoanRequestStatus",
+                      "name": "status",
+                      "type": "uint8"
+                    }
+                  ],
+                  "internalType": "struct ILoanAndSalaryAdvance.LoanRequest",
+                  "name": "loanReq",
+                  "type": "tuple"
+                }
+              ],
+              "internalType": "struct ILoanAndSalaryAdvance.EmployeePayload[]",
+              "name": "",
+              "type": "tuple[]"
             }
           ],
           "stateMutability": "view",

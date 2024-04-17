@@ -32,10 +32,10 @@ interface ILoanAndSalaryAdvance {
         LoanRequestStatus status;
     }
 
-    struct EmployerInfo {
-        bool isEmployer;
-        uint id;
-    }
+    // struct EmployerInfo {
+    //     bool isEmployer;
+    //     uint id;
+    // }
 
     function sendPayment(uint employeeId, bool acceptSaveForMe, uint start, uint stop) external returns(bool);
     function save4Me(address employerAddr, uint employeeId, bool value) external returns(bool);

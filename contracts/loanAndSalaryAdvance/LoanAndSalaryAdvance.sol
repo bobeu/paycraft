@@ -236,4 +236,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         return true;
     }
 
+    function getEmployees(address employerAddr) public view returns(EmployeePayload[] memory) {
+        return employees[employerAddr];
+    }
 }
