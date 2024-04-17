@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT 
 
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 interface IEmployer {
     error TransferFromFailed();
@@ -13,6 +13,7 @@ interface IEmployer {
         bool active;
         bool saveForMe;
         uint pay;
+        uint8 saveForMeRate;
         AdvanceRequest advanceReq;
         LoanRequest loanReq;
     }

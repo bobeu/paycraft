@@ -1,23 +1,27 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
+import { config as dotConfig } from "dotenv";
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
 
-/** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-    solidity: "0.8.17",
+dotConfig();
+
+const PRIVATE_KEY = String(process.env.PRIVATE_KEY);
+
+const config: HardhatUserConfig = {
+    solidity: "0.8.20",
     networks: {
         alfajores: {
             url: "https://alfajores-forno.celo-testnet.org",
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [PRIVATE_KEY],
         },
         celo: {
             url: "https://forno.celo.org",
-            accounts: [process.env.PRIVATE_KEY],
+            accounts: [PRIVATE_KEY],
         },
     },
     etherscan: {
         apiKey: {
-            alfajores: process.env.CELOSCAN_API_KEY,
-            celo: process.env.CELOSCAN_API_KEY,
+            alfajores: String(process.env.CELOSCAN_API_KEY),
+            celo: String(process.env.CELOSCAN_API_KEY),
         },
         customChains: [
             {
@@ -39,3 +43,5 @@ module.exports = {
         ],
     },
 };
+
+export default config;

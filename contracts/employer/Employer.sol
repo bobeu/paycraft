@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT 
 
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
+import { IEmployer } from "./IEmployer.sol";
 
 interface IERC20 {
     function allowance(address owner, address spender) external view returns (uint256);
-    // function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(
         address from,
         address to,
@@ -12,9 +12,9 @@ interface IERC20 {
     ) external returns (bool);
 }
 
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
-contract Employer is Context {
+contract Employer is Context, IEmployer {
     uint8 public loanInterestRate;
     
     address public immutable cUSD;
@@ -23,15 +23,10 @@ contract Employer is Context {
     bytes32 public immutable ACCEPTED_HASH;
     bytes32 public immutable REJECTED_HASH;
 
-    uint public employerIds;
 
-    // mapping (address => mapping(uint => bytes)) private employersPhoneMap;
     mapping (address => EmployeePayload[]) private employees;
     mapping (address => mapping (address => bool)) isAdded;
 
-    // Mapping of employer addresses to ids
-    // mapping (address => EmployerInfo) public employerIdMap; 
-    // EmployeePayload[] private employees;
     modifier validateEmployeeId(uint employeeId, address employer) {
         require(employeeId < employees[employer].length, "Invalid employeeId");
         _;
@@ -49,17 +44,11 @@ contract Employer is Context {
     receive() external payable { revert(); }
 
     function _toHash(string memory loanOrHashStr) internal pure returns(bytes32 _hash) {
-        return keccack256(abi.encode(loanOrHashStr));
+        return keccak256(abi.encode(loanOrHashStr));
     }
     
-    function addEmployee(address[] memory addresses, uint256[] memory payments) public returns(bool done) {
+    function addEmployee(address[] memory addresses, uint256[] memory payments, uint8 saveForMeRate) public returns(bool done) {
         address sender = _msgSender();
-        // EmployerInfo memory info = employerIdMap[sender];
-        // if(!info.isEmployer) {
-        //     employerIds ++;
-        //     uint id = employerIds;
-        //     employerIdMap[sender] = EmployerInfo(true, id);
-        // }
         uint addressLength = addresses.length;
         require(addressLength == payments.length, "Addresses to payment mismatch");
         for(uint8 i = 0; i < addressLength; i++) {
@@ -67,7 +56,7 @@ contract Employer is Context {
             if(addr != address(0)) {
                 if(!isAdded[sender][addr]) {
                     isAdded[sender][addr] = true;
-                    employees[sender].push(EmployeePayload( addr, i, true, false, payments[i], AdvanceRequest(0, AdvanceRequestStatus(0)), LoanRequest(0, 0, LoanRequestStatus(0))));
+                    employees[sender].push(EmployeePayload( addr, i, true, false, payments[i], saveForMeRate, AdvanceRequest(0, AdvanceRequestStatus(0)), LoanRequest(0, 0, LoanRequestStatus(0))));
                 }
             }
         }
@@ -84,7 +73,7 @@ contract Employer is Context {
         if(value) {
             require(!emp.active, "Enabled");
         } else {
-            require(emp.active, "Disabled")
+            require(emp.active, "Disabled");
         }
         employees[sender][employeeId] = value;
 
@@ -123,21 +112,21 @@ contract Employer is Context {
         address sender = _msgSender();
         EmployeePayload memory emp = employees[sender][employeeId];
         require(emp.active, "Disabled");
-        const allowance = IERC20(cUSD).allowance(sender, address(this));
+        uint allowance = IERC20(cUSD).allowance(sender, address(this));
         if(_toHash(loanOrAdvanceStr) == ADVANCE_HASH) {
             require(emp.advanceReq.status == AdvanceRequestStatus.PENDING, "Invalid request");
-            employees[sender][employeeId].advanceReq = AdvanceRequest(allowance, Status.DISBURSED);
+            employees[sender][employeeId].advanceReq = AdvanceRequest(allowance, AdvanceRequestStatus.DISBURSED);
             if(!IERC20(cUSD).transferFrom(sender, emp.identifier, allowance)) revert TransferFromFailed();
         } else if(_toHash(loanOrAdvanceStr) == LOAN_HASH) {
             require(emp.loanReq.status == LoanRequestStatus.REQUESTED, "Invalid request");
             employees[sender][employeeId].loanReq = LoanRequest(
                 allowance,
-                (allowance * rate) / 100
-                Status.RESPONDED
+                (allowance * rate) / 100,
+                LoanRequestStatus.RESPONDED
             );
-        } else (
+        } else {
             revert (loanOrAdvanceStr);
-        )
+        }
     }
 
     function acceptOrRejectLoanApproval(address employerAddr, uint employeeId, string memory acceptOrRejectStr) 
@@ -147,7 +136,7 @@ contract Employer is Context {
     {
         address sender = _msgSender();
         EmployeePayload memory emp = employees[sender][employeeId];
-        const allowance = IERC20(cUSD).allowance(employerAddr, address(this));
+        uint allowance = IERC20(cUSD).allowance(employerAddr, address(this));
         require(sender == emp.identifier, "UnAuthorized call");
         if(allowance > 0) {
             if(_toHash(acceptOrRejectStr) == ACCEPTED_HASH) {
@@ -166,6 +155,7 @@ contract Employer is Context {
     }
 
     function save4Me(address employerAddr, uint employeeId, bool value)
+        public
         validateEmployeeId(employeeId, employerAddr) 
         returns(bool) 
     {
@@ -180,7 +170,7 @@ contract Employer is Context {
     /**@dev Employers pay employees
      * Employees addition are not accepted at this point. 
      * Prior to this call, employer should use { disableOrEnableEmployee } to filter ones that should not be paid
-     * Note: pay() is an atomic transaction i.e transfer to all employees must pass simultaneously.
+     * Note: pay() is atomic by context i.e transfer to all employees must pass simultaneously.
      *      Employers should ensure enough allowance is given to cover the pays.
      */
     function pay(uint employeeId, bool acceptSaveForMe) 
@@ -189,12 +179,16 @@ contract Employer is Context {
         returns(bool) 
     {
         address sender = _msgSender();
-        const allowance = IERC20(cUSD).allowance(employerAddr, address(this));
+        uint allowance = IERC20(cUSD).allowance(sender, address(this));
         EmployeePayload[] memory plds = employees[sender];
 
         for(uint i = 0; i < plds.length; i++) {
             EmployeePayload memory pld = plds[i];
-            require(IERC20(cUSD).transferFrom(sender, pld.identifier, pld.pay));
+            if(!pld.saveForMe) {
+            }
+            if(pld.saveForMe) {
+                employees[sender][employeeId].pay += (pld.pay + ((pld.pay * pld.saveForMeRate) / 100));
+            }
         }
     }
 
