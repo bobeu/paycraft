@@ -1,13 +1,13 @@
 import { config as dotConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "hardhat-deploy";
 
 dotConfig();
 
 const PRIVATE_KEY = String(process.env.PRIVATE_KEY);
 
 const config: HardhatUserConfig = {
-    solidity: "0.8.20",
     networks: {
         alfajores: {
             url: "https://alfajores-forno.celo-testnet.org",
@@ -41,6 +41,25 @@ const config: HardhatUserConfig = {
                 },
             },
         ],
+    },
+
+    namedAccounts: {
+        deployer: {
+          default: 0,
+          44787: `privatekey://${PRIVATE_KEY}`,
+          42220: `privatekey://${PRIVATE_KEY}`,
+        },
+      },
+    
+    solidity: {
+    version: "0.8.20",
+    settings: {          // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+        enabled: true,
+        runs: 200,
+        },
+        evmVersion: "byzantium"
+        }
     },
 };
 
