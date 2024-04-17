@@ -1,4 +1,4 @@
-import { address as loanAndSalaryAdvance} from "../../deployments/alfajores/LoanAndSalaryAdvance.json";
+import { address as loanAndSalaryAdvance} from "../deployments/alfajores/LoanAndSalaryAdvance.json";
 
 export type OxString = `0x${string}`;
 export type WagmiConfig = import('wagmi').Config;

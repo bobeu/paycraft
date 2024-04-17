@@ -12,8 +12,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "testnet" : "hardhat deploy --network alfajores --export deployments/contracts.json",
-        "mainnet" : "hardhat deploy --network celo --export deployments/contracts.json"
+        "testnet": "hardhat deploy --network alfajores --export deployments/contracts.json",
+        "mainnet": "hardhat deploy --network celo --export deployments/contracts.json"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
@@ -43,8 +43,12 @@
     },
     "dependencies": {
         "@celo/contractkit": "^8.0.0",
+        "@emotion/react": "^11.11.4",
+        "@emotion/styled": "^11.11.5",
         "@headlessui/react": "^1.7.14",
         "@heroicons/react": "^2.0.18",
+        "@mui/icons-material": "^5.15.15",
+        "@mui/material": "^5.15.15",
         "@openzeppelin/contracts": "^5.0.2",
         "@rainbow-me/rainbowkit": "^2.0.2",
         "@tanstack/react-query": "^5.28.6",
