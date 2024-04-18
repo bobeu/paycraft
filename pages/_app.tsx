@@ -6,7 +6,7 @@ import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import { http, WagmiProvider, createConfig } from "wagmi";
-import Layout from "../components/Layout";
+import Layout from "../components/AppMain";
 import "../styles/globals.css";
 import { celo, celoAlfajores } from "wagmi/chains";
 
@@ -52,9 +52,9 @@ function App({ Component, pageProps }: AppProps) {
         isMounted? <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider>
-                    <Layout>
-                        <Component {...pageProps} />
-                    </Layout>
+                    <Component {...pageProps} />
+                    {/* <Layout>
+                    </Layout> */}
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider> : null
