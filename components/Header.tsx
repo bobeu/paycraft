@@ -27,11 +27,11 @@ const logoStyle = {
   
   interface AppAppBarProps {
     mode: PaletteMode;
-    showCustomTheme: boolean;
+    isEmployer: boolean;
     toggleColorMode: () => void;
   }
 
-export default function Header({ mode, toggleColorMode, showCustomTheme }: AppAppBarProps) {
+export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarProps) {
     const [hideConnectBtn, setHideConnectBtn] = useState(false);
     const { connect } = useConnect();
 
@@ -90,7 +90,7 @@ export default function Header({ mode, toggleColorMode, showCustomTheme }: AppAp
                     >
                         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: '-18px', px: 0, }} >
                             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                                
+                                <FilterAPIs { ...{ isEmployer, scrollToSection }} />
                             </Box>
                         </Box>
 
@@ -113,19 +113,7 @@ export default function Header({ mode, toggleColorMode, showCustomTheme }: AppAp
                                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end', flexGrow: 1, }} >
                                         <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
                                     </Box>
-                                    <MenuItem onClick={() => scrollToSection('features')}>
-                                        Features
-                                    </MenuItem>
-                                    <MenuItem onClick={() => scrollToSection('testimonials')}>
-                                        Testimonials
-                                    </MenuItem>
-                                    <MenuItem onClick={() => scrollToSection('highlights')}>
-                                        Highlights
-                                    </MenuItem>
-                                    <MenuItem onClick={() => scrollToSection('pricing')}>
-                                        Pricing
-                                    </MenuItem>
-                                    <MenuItem onClick={() => scrollToSection('faq')}>FAQ</MenuItem>
+                                    <FilterAPIs { ...{ isEmployer, scrollToSection }} />
                                     <Divider />
                                 </Box>
                             </Drawer>

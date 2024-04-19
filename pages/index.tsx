@@ -178,15 +178,9 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import { AutoAwesomeMotionRounded, AutoAwesomeMosaicOutlined } from '@mui/icons-material';
 import Header from '../components/Header';
 import Employer from '../components/Employer';
-import LogoCollection from '../components/LogoCollection';
-import Highlights from '../components/Highlights';
-import Pricing from '../components/Pricing';
-import Features from '../components/Features';
-import Testimonials from '../components/Testimonials';
 import FAQ from '../components/Faq';
 import Footer from '../components/Footer';
 import getLPTheme from '../components/getLPTheme';
-import Employee from '@/components/Employee';
 import AppMain from '@/components/AppMain';
 
 // interface ToggleCustomThemeProps {

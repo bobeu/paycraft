@@ -4,20 +4,22 @@ import Header from "./Header";
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import getLPTheme from './getLPTheme';
 import Box from '@mui/material/Box';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Employer from './Employer';
-import LogoCollection from './LogoCollection';
-import Highlights from './Highlights';
-import Pricing from './Pricing';
-import Features from './Features';
-import Testimonials from './Testimonials';
+// import LogoCollection from './LogoCollection';
+// import Highlights from './Highlights';
+// import Pricing from './Pricing';
+// import Features from './Features';
+// import Testimonials from './Testimonials';
 import FAQ from './Faq';
-import Employee from '@/components/Employee';
+import Employee from './Employee';
+import { EmployeePayloads } from "@/contractApis/readContract";
+import { initEmployeePayload } from "./utilities";
 
 
 
@@ -26,27 +28,18 @@ interface Props {
 }
 
 interface ToggleCustomThemeProps {
-    showCustomTheme: Boolean;
-    toggleCustomTheme: () => void;
+    isEmployer: Boolean;
+    toggleUsers: () => void;
   }
   
-  function ToggleCustomTheme({ showCustomTheme, toggleCustomTheme }: ToggleCustomThemeProps) {
-    // const [mode, setMode] = React.useState<PaletteMode>('light');
-    // const [showCustomTheme, setShowCustomTheme] = React.useState(true);
-    // const LPtheme = createTheme(getLPTheme(mode));
-    // const defaultTheme = createTheme({ palette: { mode } });
-  
-    // const toggleCustomTheme = () => {
-    //   setShowCustomTheme((prev) => !prev);
-    // };
-
+  function ToggleCustomTheme({ isEmployer, toggleUsers }: ToggleCustomThemeProps) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100dvw', position: 'fixed', bottom: 24,}}>
         <ToggleButtonGroup
           color="primary"
           exclusive
-          value={showCustomTheme}
-          onChange={toggleCustomTheme}
+          value={isEmployer}
+          onChange={toggleUsers}
           aria-label="Platform"
           sx={{
             backgroundColor: 'background.default',
@@ -64,31 +57,32 @@ interface ToggleCustomThemeProps {
 
 const AppMain = () => {
     const [mode, setMode] = React.useState<PaletteMode>('light');
-    const [showCustomTheme, setShowCustomTheme] = React.useState(true);
+    const [isEmployer, setShowCustomTheme] = React.useState(true);
     const LPtheme = createTheme(getLPTheme(mode));
+    const [contractData, setData] = React.useState<EmployeePayloads>([initEmployeePayload]);
     const defaultTheme = createTheme({ palette: { mode } });
   
     const toggleColorMode = () => {
       setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
     };
 
-    const toggleCustomTheme = () => {
+    const toggleUsers = () => {
         setShowCustomTheme((prev) => !prev);
     };
 
     return (
       <ThemeProvider theme={LPtheme}>
-        <CssBaseline />
-        <Header { ...{ mode, toggleColorMode, showCustomTheme } } />
+        {/* <CssBaseline /> */}
+        <Header { ...{ mode, toggleColorMode, isEmployer } } />
         { 
-          showCustomTheme? <Employer /> : <Employee /> 
+          isEmployer? <Employer {...{contractData} } /> : <Employee {...{contractData} } /> 
         }
         <Box sx={{ bgcolor: 'background.default' }}>
           <FAQ />
           <Footer />
         </Box>
-        <CssBaseline />
-        <ToggleCustomTheme { ...{ showCustomTheme, toggleCustomTheme } } />
+        {/* <CssBaseline /> */}
+        <ToggleCustomTheme { ...{ isEmployer, toggleUsers } } />
       </ThemeProvider>
     );
 };

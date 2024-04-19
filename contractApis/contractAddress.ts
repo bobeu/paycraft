@@ -1,4 +1,4 @@
-import { address as loanAndSalaryAdvance} from "../deployments/alfajores/LoanAndSalaryAdvance.json";
+import artifacts from "../deployments/alfajores/LoanAndSalaryAdvance.json";
 
 export type OxString = `0x${string}`;
 export type WagmiConfig = import('wagmi').Config;
@@ -7,4 +7,4 @@ export const formatAddr = (x: string | (OxString | undefined)) : OxString => {
     return `0x${x.substring(2, 42)}`;
 };
 
-export const address = formatAddr(loanAndSalaryAdvance);
+export const contractAddress = () => formatAddr(artifacts.address);

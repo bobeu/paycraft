@@ -1,8 +1,10 @@
 import { writeContract, simulateContract } from "wagmi/actions";
 import { Config } from "wagmi";
-import { OxString, address } from "./contractAddress";
-import { waitForConfirmation } from "./waitFortransaction";
+import { OxString, contractAddress } from "./contractAddress";
+import { waitForConfirmation } from "./waitForConfirmation";
+import { Callback, LoanOrAdvanceStr } from "./readContract";
 
+const address = contractAddress();
 const requestAdvanceOrLoanAbi = [
     {
         "inputs": [
@@ -19,7 +21,7 @@ const requestAdvanceOrLoanAbi = [
           {
             "internalType": "uint256",
             "name": "amount",
-            "type": "uint256"
+            "type": "uint24"
           },
           {
             "internalType": "string",
@@ -40,16 +42,17 @@ const requestAdvanceOrLoanAbi = [
     },
 ] as const;
 
-export async function acceptOrRejectLoan(args: {config: Config, amount: bigint, employerAddr: OxString, empployeeId: bigint, loanOrAdvanceStr: string, account: OxString}) {
-  const { config, empployeeId, amount, account, employerAddr, loanOrAdvanceStr } = args;
+export async function requestAdvanceOrLoan(args: {config: Config, amount: number, employerAddr: OxString, employeeId: bigint, loanOrAdvanceStr: LoanOrAdvanceStr, callback: Callback, account: OxString}) {
+  const { config, employeeId, amount, account, employerAddr, callback, loanOrAdvanceStr } = args;
+  callback({txStatus: "Pending"});
   const { request } = await simulateContract(config, {
     address,
     account,
     abi: requestAdvanceOrLoanAbi,
     functionName: "requestAdvanceOrLoan",
-    args: [employerAddr, empployeeId, amount, loanOrAdvanceStr],
+    args: [employerAddr, employeeId, amount, loanOrAdvanceStr],
   });
-
+  callback({txStatus: "Confirming"});
   const hash = await writeContract(config, request ); 
-  return await waitForConfirmation(config, hash);
+  return await waitForConfirmation(config, hash, account, callback);
 }

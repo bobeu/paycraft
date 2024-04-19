@@ -1,3 +1,4 @@
+import "../styles/globals.css";
 import {
     RainbowKitProvider,
     connectorsForWallets,
@@ -7,7 +8,6 @@ import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import { http, WagmiProvider, createConfig } from "wagmi";
 import Layout from "../components/AppMain";
-import "../styles/globals.css";
 import { celo, celoAlfajores } from "wagmi/chains";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

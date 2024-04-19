@@ -9,6 +9,7 @@ interface ILoanAndSalaryAdvance {
     enum LoanRequestStatus {NONE, REQUESTED, RESPONDED, ACCEPTED, SERVICED}
     struct EmployeePayload {
         address identifier;
+        address employer;
         uint workId;
         bool active;
         bool saveForMe;
@@ -37,12 +38,12 @@ interface ILoanAndSalaryAdvance {
     //     uint id;
     // }
 
-    function sendPayment(uint employeeId, bool acceptSaveForMe, uint start, uint stop) external returns(bool);
+    function sendPayment(uint employeeId, bool acceptSaveForMe) external returns(bool);
     function save4Me(address employerAddr, uint employeeId, bool value) external returns(bool);
     function acceptOrRejectLoanApproval(address employerAddr, uint employeeId, string memory acceptOrRejectStr) external returns(bool);
     function approveLoanOrAdvanceRequest(uint employeeId, uint8 interestRate, uint8 amortizationRate, string memory loanOrAdvanceStr) external returns(bool);
-    function requestAdvanceOrLoan(address employerAddr, uint employeeId, uint amount, string memory loanOrAdvanceStr) external returns(bool);
+    function requestAdvanceOrLoan(address employerAddr, uint employeeId, uint24 amount, string memory loanOrAdvanceStr) external returns(bool);
     function disableOrEnableEmployee(uint employeeId, bool value) external returns(bool);
-    function addEmployee(address[] memory addresses, uint256[] memory payments, uint8 saveForMeRate, uint8 amortizationRate) external returns(bool done);
+    function addEmployee(address addresses, uint256 payments, uint8 saveForMeRate, uint8 amortizationRate) external returns(bool done);
     
 }

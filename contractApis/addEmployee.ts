@@ -1,55 +1,58 @@
 import { writeContract, simulateContract } from "wagmi/actions";
 import { Config } from "wagmi";
-import { OxString, address } from "./contractAddress";
-import { waitForConfirmation } from "./waitFortransaction";
+import { OxString, contractAddress } from "./contractAddress";
+import { waitForConfirmation } from "./waitForConfirmation";
+import { Callback } from "./readContract";
 
+const address = contractAddress();
 const addEmployerAbi = [
-    {
-        "inputs": [
-          {
-            "internalType": "address[]",
-            "name": "addresses",
-            "type": "address[]"
-          },
-          {
-            "internalType": "uint256[]",
-            "name": "payments",
-            "type": "uint256[]"
-          },
-          {
-            "internalType": "uint8",
-            "name": "saveForMeRate",
-            "type": "uint8"
-          },
-          {
-            "internalType": "uint8",
-            "name": "amortizationRate",
-            "type": "uint8"
-          }
-        ],
-        "name": "addEmployee",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "done",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employee",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "payment",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "saveForMeRate",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "amortizationRate",
+        "type": "uint8"
+      }
+    ],
+    "name": "addEmployee",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "done",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
 ] as const;
 
-export async function acceptOrRejectLoan(args: {config: Config, empployeeAddrs: OxString[], payments: bigint[], saveForMeRate: number, amortizationRate: number, account: OxString}) {
-  const { config, empployeeAddrs, saveForMeRate, amortizationRate, payments, account } = args;
+export async function addEmployee(args: {config: Config, employeeAddr: OxString, payment: bigint, saveForMeRate: number, amortizationRate: number, callback: Callback, account: OxString}) {
+  const { config, employeeAddr, saveForMeRate, callback, amortizationRate, payment, account } = args;
+  callback({txStatus: "Pending"});
   const { request } = await simulateContract(config, {
     address,
     account,
     abi: addEmployerAbi,
     functionName: "addEmployee",
-    args: [empployeeAddrs, payments, saveForMeRate, amortizationRate],
+    args: [employeeAddr, payment, saveForMeRate, amortizationRate],
   });
-
+  callback({txStatus: "Confirming"});
   const hash = await writeContract(config, request ); 
-  return await waitForConfirmation(config, hash);
+  return await waitForConfirmation(config, hash, account, callback);
 }

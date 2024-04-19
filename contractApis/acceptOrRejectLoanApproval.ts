@@ -1,8 +1,10 @@
 import { writeContract, simulateContract } from "wagmi/actions";
 import { Config } from "wagmi";
-import { OxString, address } from "./contractAddress";
-import { waitForConfirmation } from "./waitFortransaction";
+import { OxString, contractAddress } from "./contractAddress";
+import { waitForConfirmation } from "./waitForConfirmation";
+import { Callback, AcceptOrRejectLoan } from "./readContract";
 
+const address = contractAddress();
 const acceptOrRejectLoanAbi = [
     {
         "inputs": [
@@ -35,16 +37,17 @@ const acceptOrRejectLoanAbi = [
     },
 ] as const;
 
-export async function acceptOrRejectLoan(args: {config: Config, empployerAddr: OxString, employerId: bigint, acceptOrRejectStr: string, account: OxString}) {
-  const { config, employerId, empployerAddr, acceptOrRejectStr, account } = args;
+export async function acceptOrRejectLoan(args: {config: Config, employerAddr: OxString, employeeId: bigint, acceptOrRejectStr: AcceptOrRejectLoan, callback: Callback, account: OxString}) {
+  const { config, employeeId, employerAddr, acceptOrRejectStr, account, callback } = args;
+  callback({txStatus: "Pending"});
   const { request } = await simulateContract(config, {
     address,
     account,
     abi: acceptOrRejectLoanAbi,
     functionName: "acceptOrRejectLoanApproval",
-    args: [empployerAddr, employerId, acceptOrRejectStr],
+    args: [employerAddr, employeeId, acceptOrRejectStr],
   });
-
+  callback({txStatus: "Confirming"});
   const hash = await writeContract(config, request ); 
-  return await waitForConfirmation(config, hash);
+  return await waitForConfirmation(config, hash, account, callback);
 }

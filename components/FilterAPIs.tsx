@@ -32,7 +32,7 @@ export default function FilterAPIs({ scrollToSection, isEmployer }: FilterAPIsPr
     );
 }
 
-const EMPLOYER_APIS_TAGS = [
+export const EMPLOYER_APIS_TAGS = [
     "Add Employee",
     "Approve",
     "Activate",
@@ -40,7 +40,7 @@ const EMPLOYER_APIS_TAGS = [
     "Pay"
 ];
 
-const EMPLOYEES_APIS_TAGS = [
+export const EMPLOYEES_APIS_TAGS = [
     "Save4Me",
     "Loans & Advances",
     "Request Loan",
