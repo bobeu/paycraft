@@ -13,7 +13,7 @@ import { OxString } from '@/contractApis/contractAddress';
 
 const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
 
-export default function SelectEmployer({data, setSelected, selected} : {data: EmployeePayloads, setSelected: (x: EmployeePayload) => void, selected: string}) {
+export default function SelectPayload({filteredPayloads : fp, setSelectedPayload, selectedUser: sp} : {filteredPayloads: EmployeePayloads, setSelectedPayload: (x: EmployeePayload) => void, selectedUser: string}) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -21,7 +21,7 @@ export default function SelectEmployer({data, setSelected, selected} : {data: Em
     // event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
   ) => {
-    setSelected(data[index]);
+    setSelectedPayload(fp[index]);
     setOpen(false);
   };
 
@@ -48,7 +48,7 @@ export default function SelectEmployer({data, setSelected, selected} : {data: Em
         aria-label="Button group with a nested menu"
         // style={{padding: "10px"}}
       >
-        <Button disabled style={{padding: "12px"}} >{selected}</Button>
+        <Button disabled style={{padding: "12px"}} >{sp}</Button>
         <Button
           size="medium"
           aria-controls={open ? 'split-button-menu' : undefined}
@@ -78,14 +78,14 @@ export default function SelectEmployer({data, setSelected, selected} : {data: Em
             <Paper>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {data.map((option, i) => (
+                  {fp.map((fp, i) => (
                     <MenuItem
                       key={i}
                       // disabled={index === 2}
-                      selected={option.employer === selected}
+                      selected={fp.employer === sp}
                       onClick={(event) => handleMenuItemClick(i)}
                     >
-                      {option.employer}
+                      {fp.employer}
                     </MenuItem>
                   ))}
                 </MenuList>

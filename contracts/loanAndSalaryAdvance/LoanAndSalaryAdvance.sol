@@ -53,24 +53,24 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
     }
 
     function _amortize(uint employeeId, EmployeePayload memory pld) internal returns(uint payBalance) {
-        if(pld.loanReq.amount > 0) {
-            uint loanBal = pld.loanReq.amount;
+        uint loanBal = pld.loanReq.amount;
+        if(loanBal > 0) {
             pld.loanReq.amortizationAmt <= loanBal? 
                 (loanBal -= pld.loanReq.amortizationAmt, payBalance = pld.pay - pld.loanReq.amortizationAmt) : 
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
             employees[employeeId].loanReq.amount = loanBal;
-            if(loanBal > 0) {
+            if(loanBal == 0) {
                 employees[employeeId].loanReq.status = LoanRequestStatus.SERVICED;
             }
         }
 
-        if(pld.advanceReq.amount > 0) {
-            uint loanBal = pld.advanceReq.amount;
+        loanBal = pld.advanceReq.amount;
+        if(loanBal > 0) {
             pld.advanceReq.amortizationAmt <= loanBal? 
                 (loanBal -= pld.advanceReq.amortizationAmt, payBalance = pld.pay - pld.advanceReq.amortizationAmt) : 
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
             employees[employeeId].advanceReq.amount = loanBal;
-            if(loanBal > 0) {
+            if(loanBal == 0) {
                 employees[employeeId].advanceReq.status = AdvanceRequestStatus.SERVICED;
             }
         }
@@ -79,6 +79,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
     function addEmployee(address employee, uint256 payment, uint8 saveForMeRate) public returns(bool done) {
         address sender = _msgSender();
         require(employee != address(0), "Addresses is empty");
+        require(employee != sender, "Employer is the employer");
         if(!isAdded[sender][employee]) {
             isAdded[sender][employee] = true;
             employees.push(EmployeePayload( employee, sender, employees.length, true, false, payment, saveForMeRate, 0, AdvanceRequest(0, 0, AdvanceRequestStatus(0)), LoanRequest(0, 0, 0, LoanRequestStatus(0))));
@@ -224,9 +225,9 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
             _sendPayment(sender, pld.identifier, pay);
         }
         if(pld.saveForMe && acceptSaveForMe) {
-            employees[employeeId].pay += (pld.pay + ((pld.pay * pld.saveForMeRate) / 100));
+            employees[employeeId].pay = (pay + ((pay * pld.saveForMeRate) / 100));
         }
-
+        
         return true;
     }
 

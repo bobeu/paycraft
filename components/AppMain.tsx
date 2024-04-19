@@ -11,10 +11,11 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Employer from './Employer';
 import FAQ from './Faq';
 import Employee from './Employee';
-import { Callback, EmployeePayloads, Status, getEmployees } from "@/contractApis/readContract";
-import { initEmployeePayload } from "./utilities";
+import { Callback, EmployeePayload, EmployeePayloads, Status, getEmployees } from "@/contractApis/readContract";
+import { filterUser, initEmployeePayload } from "./utilities";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
+import SelectPayload from "./SelectPayload";
 
 
 
@@ -51,59 +52,72 @@ interface ToggleCustomThemeProps {
   }
 
 const AppMain = () => {
-    const [mode, setMode] = React.useState<PaletteMode>('light');
-    const [isEmployer, setShowCustomTheme] = React.useState(true);
-    const LPtheme = createTheme(getLPTheme(mode));
-    const [payloads, setData] = React.useState<EmployeePayloads>([initEmployeePayload]);
-    const [txStatus, setStatus] = React.useState<Status>("Pending");
-    // const defaultTheme = createTheme({ palette: { mode } });
-
-    const { isConnected, address } = useAccount();
-    const config = useConfig();
+  const [mode, setMode] = React.useState<PaletteMode>('light');
+  const [isEmployer, setShowCustomTheme] = React.useState(true);
+  const LPtheme = createTheme(getLPTheme(mode));
+  const [payloads, setPayloads] = React.useState<EmployeePayloads>([initEmployeePayload]);
+  const [payload, setPayload] = React.useState<EmployeePayload>(initEmployeePayload);
+  const [filteredPayloads, setFilteredPayloads] = React.useState<EmployeePayloads>([initEmployeePayload]);
+  const [txStatus, setStatus] = React.useState<Status>("Pending");
+  // const defaultTheme = createTheme({ palette: { mode } });
   
-    const toggleColorMode = () => {
-      setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
-    };
+  const { isConnected, address } = useAccount();
+  const config = useConfig();
 
-    const toggleUsers = () => {
-        setShowCustomTheme((prev) => !prev);
-    };
+  const toggleColorMode = () => {
+    setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
-    const callback : Callback = (args: {txStatus? : Status, result?: EmployeePayloads}) => {
-      const { txStatus, result } = args; 
-      if(txStatus) setStatus(txStatus);
-      if(result) setData(result);
-    };
+  const setSelectedPayload = (x: EmployeePayload) => {
+    setPayload(x);
+  };
 
-    React.useEffect(() => {
-      const controller = new AbortController();
-      if(isConnected) {
-        const readContract = async() => {
-          await getEmployees({
-            config,
-            account: formatAddr(address),
-            callback
-          });
-        }
-        readContract();
-        return () => {
-          controller.abort();
-        }
+  const toggleUsers = () => {
+    setShowCustomTheme((prev) => {
+      const newValue = !prev;
+      setFilteredPayloads(filterUser(formatAddr(address), payloads, newValue));
+      return newValue;
+    });
+  };
+
+  const callback : Callback = (args: {txStatus? : Status, result?: EmployeePayloads}) => {
+    const { txStatus, result } = args; 
+    if(txStatus) setStatus(txStatus);
+    if(result) setPayloads(result);
+  };
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+    if(isConnected) {
+      const readContract = async() => {
+        await getEmployees({
+          config,
+          account: formatAddr(address),
+          callback
+        });
       }
-    }, []);
+      readContract();
+      return () => {
+        controller.abort();
+      }
+    }
+  }, [isConnected]);
 
-    return (
-      <ThemeProvider theme={LPtheme}>
-        <CssBaseline />
-        <Header { ...{ mode, toggleColorMode, isEmployer } } />
-        { isEmployer? <Employer contractData={payloads} {...{callback} } /> : <Employee contractData={payloads} {...{callback} } /> }
-        <Box sx={{ bgcolor: 'background.default' }}>
-          <FAQ />
-          <Footer />
-        </Box>
-        <ToggleCustomTheme { ...{ isEmployer, toggleUsers } } />
-      </ThemeProvider>
-    );
+  return (
+    <ThemeProvider theme={LPtheme}>
+      <CssBaseline />
+      <Header { ...{ mode, toggleColorMode, isEmployer } } />
+      <Box sx={{marginTop: 12, display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <SelectPayload { ...{filteredPayloads, setSelectedPayload}} selectedUser={isEmployer? payload.employer : payload.identifier} />
+      </Box>
+      <Box sx={{marginY: 0, padding: 2}}>
+        { isEmployer? <Employer {...{callback, payload} } /> : <Employee {...{callback, payload} } /> }
+      </Box>
+      <FAQ />
+      <Footer />
+      <ToggleCustomTheme { ...{ isEmployer, toggleUsers } } />
+    </ThemeProvider>
+  );
 };
 
 export default AppMain;

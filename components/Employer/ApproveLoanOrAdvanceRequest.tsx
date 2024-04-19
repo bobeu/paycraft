@@ -10,7 +10,7 @@ import { approveLoanOrAdvanceRequest } from "@/contractApis/approveLoanOrAdvance
 import { formatAddr } from "@/contractApis/contractAddress";
 import TextField from "@mui/material/TextField";
 
-export default function ApproveLoanOrAdvanceRequest({selectedEmployee : sem, callback} : {selectedEmployee: EmployeePayload, callback: Callback}) {
+export default function ApproveLoanOrAdvanceRequest({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
     const { address, isConnected } = useAccount();
     const config = useConfig();
     const [amortizationRate, setRate] = React.useState<string>('0');
@@ -21,7 +21,7 @@ export default function ApproveLoanOrAdvanceRequest({selectedEmployee : sem, cal
         await approveLoanOrAdvanceRequest({
             account: formatAddr(address),
             callback,
-            employeeId: sem.workId,
+            employeeId: pl.workId,
             config,
             amortizationRate: bn(amortizationRate).toNumber(),
             interestRate: bn(interestRate).toNumber(),
@@ -43,19 +43,19 @@ export default function ApproveLoanOrAdvanceRequest({selectedEmployee : sem, cal
                             <Button 
                                 sx={{width: "100%"}}
                                 startIcon={"Advance request"}
-                                endIcon={sem.advanceReq.amount.toString()}
+                                endIcon={pl.advanceReq.amount.toString()}
                             />
                             <Button 
                                 sx={{width: "100%"}}
                                 startIcon={"Loan request"}
-                                endIcon={sem.loanReq.amount.toString()}
+                                endIcon={pl.loanReq.amount.toString()}
                             />
                         </Stack>
                     </Box>
                     <Stack spacing={0} sx={{ width: '100%' }}>
-                        <Box sx={{marginY: "6px"}}>
-                            <Typography variant="body2">{sem.identifier}</Typography>
-                        </Box>
+                        {/* <Box sx={{marginY: "6px"}}>
+                            <Typography variant="body2">{pl.identifier}</Typography>
+                        </Box> */}
                         <Box sx={{marginY: "6px", display: "flex", justifyContent: "space-between"}} >
                             <Button 
                                 sx={{width: "50%"}}
@@ -97,7 +97,7 @@ export default function ApproveLoanOrAdvanceRequest({selectedEmployee : sem, cal
                             <Button 
                                 sx={{width: "50%"}} 
                                 variant="text" 
-                                disabled={bn(sem.loanReq.amount).isZero() || !(sem.loanReq.status === LoanRequestStatus.REQUESTED)} 
+                                disabled={bn(pl.loanReq.amount).isZero() || !(pl.loanReq.status === LoanRequestStatus.REQUESTED)} 
                                 onClick={async() => sendRequest("LOAN")}
                             >
                                 Aprrove loan
@@ -105,7 +105,7 @@ export default function ApproveLoanOrAdvanceRequest({selectedEmployee : sem, cal
                             <Button 
                                 sx={{width: "50%"}} 
                                 variant="text" 
-                                disabled={bn(sem.advanceReq.amount).isZero() || sem.advanceReq.status === AdvanceRequestStatus.DISBURSED}
+                                disabled={bn(pl.advanceReq.amount).isZero() || pl.advanceReq.status === AdvanceRequestStatus.DISBURSED}
                                 onClick={async() => sendRequest("ADVANCE")}
                             >
                                 Approve advance

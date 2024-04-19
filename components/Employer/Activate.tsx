@@ -8,7 +8,7 @@ import { disableOrEnableEmployee } from "@/contractApis/disableOrEnableEmployee"
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 
-export default function Activate({selectedEmployee : sem, callback} : {callback: Callback, selectedEmployee: EmployeePayload}) {
+export default function Activate({payload : pl, callback} : {callback: Callback, payload: EmployeePayload}) {
     const { address, isConnected } = useAccount();
     const config = useConfig();
 
@@ -17,7 +17,7 @@ export default function Activate({selectedEmployee : sem, callback} : {callback:
         await disableOrEnableEmployee({
             account: formatAddr(address),
             callback,
-            employeeId: sem.workId,
+            employeeId: pl.workId,
             config,
             value
         });
@@ -34,10 +34,10 @@ export default function Activate({selectedEmployee : sem, callback} : {callback:
                 <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
                     <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Activate Employee</Typography></Button>
                     <Stack spacing={0} sx={{ width: '100%' }}>
-                        <Typography variant="body2">{sem.identifier}</Typography>
+                        {/* <Typography variant="body2">{pl.identifier}</Typography> */}
                         <div style={{marginTop: "12px"}}>
-                            <Button onClick={async() => sendRequest(true)} sx={{width: "50%"}} variant="text" disabled={sem.active} >Activate</Button>
-                            <Button onClick={async() => sendRequest(false)} sx={{width: "50%"}} variant="text" disabled={!sem.active} >Deactivate</Button>
+                            <Button onClick={async() => sendRequest(true)} sx={{width: "50%"}} variant="text" disabled={pl.active} >Activate</Button>
+                            <Button onClick={async() => sendRequest(false)} sx={{width: "50%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
                         </div>
                     </Stack>
                 </div>

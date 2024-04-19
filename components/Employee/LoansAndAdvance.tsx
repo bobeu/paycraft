@@ -8,9 +8,9 @@ import { acceptOrRejectLoan } from "@/contractApis/acceptOrRejectLoanApproval";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 
-export default function LoansAndAdvance({selectedEmployer : sem, callback} : {selectedEmployer: EmployeePayload, callback: Callback}) {
-    const loanCondition = sem.loanReq.status === LoanRequestStatus.RESPONDED;
-    const advanceCondition = sem.advanceReq.status === AdvanceRequestStatus.PENDING;
+export default function LoansAndAdvance({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
+    const loanCondition = pl.loanReq.status === LoanRequestStatus.RESPONDED;
+    const advanceCondition = pl.advanceReq.status === AdvanceRequestStatus.PENDING;
     const { address, isConnected } = useAccount();
     const config = useConfig();
 
@@ -19,8 +19,8 @@ export default function LoansAndAdvance({selectedEmployer : sem, callback} : {se
         await acceptOrRejectLoan({
             account: formatAddr(address),
             callback,
-            employerAddr: sem.employer,
-            employeeId: sem.workId,
+            employerAddr: pl.employer,
+            employeeId: pl.workId,
             acceptOrRejectStr,
             config
         });
@@ -39,28 +39,28 @@ export default function LoansAndAdvance({selectedEmployer : sem, callback} : {se
                     <Box sx={{display: "flex",justifyContent: "space-between", alignItems: "center"}}>
                         <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Loan</Typography></Button>
                         <Button variant="text" sx={{width: "20%"}}>
-                            { LoanStatus[sem.loanReq.status]}
+                            { LoanStatus[pl.loanReq.status]}
                         </Button>
                     </Box>
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
                         <Typography variant="h6">Work Id</Typography>
                         <Button variant="text" sx={{width: "20%"}}>
-                            { sem.workId.toString()}
+                            { pl.workId.toString()}
                         </Button>
                     </Box>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px'}}>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Balance</Typography>
-                            <Typography>{sem.loanReq.amount.toString()}</Typography>
+                            <Typography>{pl.loanReq.amount.toString()}</Typography>
                         </Box>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Interest</Typography>
-                            <Typography>{sem.loanReq.interest.toString()}</Typography>
+                            <Typography>{pl.loanReq.interest.toString()}</Typography>
                         </Box>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Amortization</Typography>
-                            <Typography>{sem.loanReq.amortizationAmt.toString()}</Typography>
+                            <Typography>{pl.loanReq.amortizationAmt.toString()}</Typography>
                         </Box>
                     </div>
                     <div style={{width: "100%"}}>
@@ -77,17 +77,17 @@ export default function LoansAndAdvance({selectedEmployer : sem, callback} : {se
                     <Box sx={{display: "flex",justifyContent: "space-between"}}>
                         <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Advance</Typography></Button>
                         <Button variant="text" sx={{width: "20%"}}>
-                            { LoanStatus[sem.advanceReq.status]}
+                            { LoanStatus[pl.advanceReq.status]}
                         </Button>
                     </Box>
                     <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px'}}>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Balance</Typography>
-                            <Typography>{sem.advanceReq.amount.toString()}</Typography>
+                            <Typography>{pl.advanceReq.amount.toString()}</Typography>
                         </Box>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Amortization</Typography>
-                            <Typography>{sem.advanceReq.amortizationAmt.toString()}</Typography>
+                            <Typography>{pl.advanceReq.amortizationAmt.toString()}</Typography>
                         </Box>
                     </div>
                     <div style={{width: "100%"}}>

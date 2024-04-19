@@ -1,9 +1,9 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { Callback, EmployeePayload } from "@/contractApis/readContract";
+import { Callback } from "@/contractApis/readContract";
 import { useAccount, useConfig } from "wagmi";
 import { addEmployee } from "@/contractApis/addEmployee";
-import { OxString, formatAddr } from "@/contractApis/contractAddress";
+import { formatAddr } from "@/contractApis/contractAddress";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
@@ -25,7 +25,6 @@ export default function AddEmployee({callback} : {callback: Callback}) {
             account: formatAddr(address),
             config,
             callback,
-            // amortizationRate: bn(amortizationRate).toNumber(),
             employeeAddr: formatAddr(employee),
             payment: toBigInt(payment),
             saveForMeRate: bn(saveForMeRate).toNumber()
@@ -75,17 +74,6 @@ export default function AddEmployee({callback} : {callback: Callback}) {
                                     setPayment(event.currentTarget.value);
                                 }}
                             />
-                            {/* <TextField
-                                type="number"
-                                placeholder="0"
-                                // required
-                                label="Amortization"
-                                title="Amortization in %"
-                                onChange={(event) => {
-                                    event.preventDefault();
-                                    setRate(event.currentTarget.value);
-                                }}
-                            /> */}
                             <TextField
                                 type="number"
                                 placeholder="0"

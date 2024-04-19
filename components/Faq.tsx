@@ -45,7 +45,7 @@ export default function FAQ() {
       <Box sx={{ width: '100%' }}>
         <Collapsible
           title='testing'
-          openOnEntry
+          openOnEntry={false}
           titleSwitch='switch'
         >
           <Box>

@@ -8,7 +8,7 @@ import { useAccount } from "wagmi";
 import { useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 
-export default function Save4Me({selectedEmployer : sem, callback} : {selectedEmployer: EmployeePayload, callback: Callback}) {
+export default function Save4Me({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
     const { address, isConnected } = useAccount();
     const config = useConfig();
     const sendRequest = async(value: boolean) => {
@@ -17,8 +17,8 @@ export default function Save4Me({selectedEmployer : sem, callback} : {selectedEm
             account: formatAddr(address),
             callback,
             config,
-            employerAddr: sem.employer,
-            employeId: sem.workId,
+            employerAddr: pl.employer,
+            employeId: pl.workId,
             value
         });
     }
@@ -36,8 +36,8 @@ export default function Save4Me({selectedEmployer : sem, callback} : {selectedEm
                 </Box>
                 <Typography sx={{marginBottom: 2}}><span style={{color: "green", fontSize:"18px"}}>Save4Me</span> allows you to save your earnings with your employer until the next payment or until you disable it. You will earn a compounded interest so long the instruction remains active.</Typography>
                 <div>
-                    <Button onClick={async() => await sendRequest(true)} disabled={sem.saveForMe} style={{width: "50%"}}>Enable</Button>
-                    <Button onClick={async() => await sendRequest(false)} disabled={!sem.saveForMe} style={{width: "50%"}}>Disable</Button>
+                    <Button onClick={async() => await sendRequest(true)} disabled={pl.saveForMe} style={{width: "50%"}}>Enable</Button>
+                    <Button onClick={async() => await sendRequest(false)} disabled={!pl.saveForMe} style={{width: "50%"}}>Disable</Button>
                 </div>
             </div>
         </section>

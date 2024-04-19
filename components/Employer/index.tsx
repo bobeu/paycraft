@@ -6,25 +6,15 @@ import Stack from '@mui/material/Stack';
 import Activate from './Activate';
 import AddEmployee from './AddEmployee';
 import Pay from './Pay';
-import { Callback, EmployeePayload, EmployeePayloads } from '@/contractApis/readContract';
-import { filterUser, initEmployeePayload } from '../utilities';
-import { useAccount } from 'wagmi';
-import { formatAddr } from '@/contractApis/contractAddress';
-import SelectEmployer from '../SelectEmployer';
+import { Callback, EmployeePayload } from '@/contractApis/readContract';
 import ApproveLoanOrAdvanceRequest from './ApproveLoanOrAdvanceRequest';
 
-export default function Employer({contractData, callback} : {contractData: EmployeePayloads, callback: Callback}) {
-  // const [selectedData, setData] = React.useState<EmployeePayload>(initEmployeePayload);
-  const { address } = useAccount();
-  const employees = filterUser(formatAddr(address), contractData, true);
-  const [selectedEmployee, setEmployee] = React.useState<EmployeePayload>(initEmployeePayload);
-  
-  const setSelected = (x: EmployeePayload) => setEmployee(x);
+export default function Employer({payload, callback} : {payload: EmployeePayload, callback: Callback}) {
   const actions = Array.from([
     <AddEmployee { ...{ callback } } />,
-    <Activate { ...{ callback, selectedEmployee } } />,
-    <Pay { ...{ callback, selectedEmployee } } />,
-    <ApproveLoanOrAdvanceRequest { ...{ callback, selectedEmployee } } />
+    <Activate { ...{ callback, payload } } />,
+    <Pay { ...{ callback, payload } } />,
+    <ApproveLoanOrAdvanceRequest { ...{ callback, payload } } />
   ]);
 
   return (
@@ -44,12 +34,11 @@ export default function Employer({contractData, callback} : {contractData: Emplo
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          pt: { xs: 14, sm: 20 },
-          pb: { xs: 8, sm: 12 },
+          pt: { xs: 2, sm: 4 },
+          pb: { xs: 6, sm: 4 },
         }}
       >
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
-          <SelectEmployer data={employees} setSelected={setSelected} selected={selectedEmployee.identifier} />
           {
             actions.map((action, key) => (
               <React.Fragment key={key}>{ action }</React.Fragment>

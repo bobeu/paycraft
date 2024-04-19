@@ -8,7 +8,7 @@ import { useAccount, useConfig } from "wagmi";
 import { sendPayment } from "@/contractApis/sendPayment";
 import { formatAddr } from "@/contractApis/contractAddress";
 
-export default function Pay({selectedEmployee: sem, callback} : {selectedEmployee: EmployeePayload, callback: Callback}) {
+export default function Pay({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
     const { address, isConnected } = useAccount();
     const config = useConfig();
     const [acceptSaveForMe, setSave4Me] = React.useState<boolean>(false);
@@ -18,7 +18,7 @@ export default function Pay({selectedEmployee: sem, callback} : {selectedEmploye
         await sendPayment({
             account: formatAddr(address),
             callback,
-            employeeId: sem.workId,
+            employeeId: pl.workId,
             config,
             acceptSaveForMe
         });
@@ -39,10 +39,10 @@ export default function Pay({selectedEmployee: sem, callback} : {selectedEmploye
                 <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
                     <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Pay</Typography></Button>
                     <Stack spacing={3} sx={{ width: '100%' }}>
-                        <Typography variant="body2">{sem.identifier}</Typography>
+                        {/* <Typography variant="body2">{pl.identifier}</Typography> */}
                         <Box sx={{display: "flex", justifyContent: 'space-between', alignItems: "center"}}>
-                            <Typography variant="body2">Amount Payable</Typography>
-                            <Typography variant="body2">{sem.pay.toString()}</Typography>
+                            <Typography variant="body2">{"Salary/Wage"}</Typography>
+                            <Typography variant="body2">{pl.pay.toString()}</Typography>
                         </Box>
                         <Box style={{marginTop: "12px", float: "right"}}>
                             <Typography variant="body2">Accept save4Me <span style={{fontWeight: "bold", fontSize: "12px"}}>{"(Default is false)"}</span></Typography>
@@ -50,7 +50,7 @@ export default function Pay({selectedEmployee: sem, callback} : {selectedEmploye
                         </Box>
                         <Box style={{marginTop: "12px"}}>
                             <Button onClick={sendRequest} sx={{width: "50%"}} variant="text" >Pay</Button>
-                            <Button onClick={approve} sx={{width: "50%"}} variant="text" >Approve Spending</Button>
+                            <Button onClick={approve} sx={{width: "50%"}} variant="text" >Unlock</Button>
                         </Box>
                     </Stack>
                 </div>

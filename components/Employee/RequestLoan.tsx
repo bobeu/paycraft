@@ -10,9 +10,9 @@ import { requestAdvanceOrLoan } from "@/contractApis/requestAdvanceOrLoan";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 
-export default function RequestLoan({selectedEmployer : sem, callback} : {selectedEmployer: EmployeePayload, callback: Callback}) {
-    const loanCondition = bn(sem.loanReq.amount).isZero() || (sem.loanReq.status === LoanRequestStatus.NONE || sem.loanReq.status === LoanRequestStatus.SERVICED);
-    const advanceCondition = bn(sem.advanceReq.amount).isZero() || (sem.advanceReq.status === AdvanceRequestStatus.NONE || sem.advanceReq.status === AdvanceRequestStatus.SERVICED);
+export default function RequestLoan({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
+    const loanCondition = bn(pl.loanReq.amount).isZero() || (pl.loanReq.status === LoanRequestStatus.NONE || pl.loanReq.status === LoanRequestStatus.SERVICED);
+    const advanceCondition = bn(pl.advanceReq.amount).isZero() || (pl.advanceReq.status === AdvanceRequestStatus.NONE || pl.advanceReq.status === AdvanceRequestStatus.SERVICED);
     const [loan, setLoan] = React.useState<string>('0');
     const [advance, setAdvance] = React.useState<string>('0');
 
@@ -26,8 +26,8 @@ export default function RequestLoan({selectedEmployer : sem, callback} : {select
             config,
             amount: bn(value).toNumber(),
             callback,
-            employerAddr: sem.employer,
-            employeeId: sem.workId,
+            employerAddr: pl.employer,
+            employeeId: pl.workId,
             loanOrAdvanceStr
         })
     }

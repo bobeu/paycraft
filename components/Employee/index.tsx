@@ -1,36 +1,19 @@
 import * as React from 'react';
 import { alpha } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import LoansAndAdvance from './LoansAndAdvance';
 import RequestLoan from './RequestLoan';
 import Save4Me from './Save4Me';
-import { AdvanceRequestStatus, Callback, EmployeePayload, EmployeePayloads, LoanRequestStatus } from '@/contractApis/readContract';
-import { bn, filterUser, initEmployeePayload,  } from '../utilities';
-import { useAccount } from 'wagmi';
-import { OxString, formatAddr } from '@/contractApis/contractAddress';
-import SelectEmployer from '../SelectEmployer';
+import {  Callback, EmployeePayload } from '@/contractApis/readContract';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-export default function Employee({contractData, callback} : {contractData: EmployeePayloads, callback: Callback}) {
-  const { address } = useAccount();
-  const employers = filterUser(formatAddr(address), contractData, false);
-  // const [selectedData, setData] = React.useState<EmployeePayload>(initEmployeePayload);
-  const [selectedEmployer, setEmployer] = React.useState<EmployeePayload>(initEmployeePayload);
-  
-  // const disabledLoanButton = bn(selectedEmployer.loanReq.amount).isZero() || selectedEmployer.loanReq.status === LoanRequestStatus.NONE || selectedEmployer.loanReq.status === LoanRequestStatus.SERVICED;
-  // const disabledadvanceButton = bn(selectedEmployer.advanceReq.amount).isZero() || selectedEmployer.advanceReq.status === AdvanceRequestStatus.NONE || selectedEmployer.advanceReq.status === AdvanceRequestStatus.SERVICED;
-  
-  const setSelected = (x: EmployeePayload) => setEmployer(x);
+export default function Employee({payload, callback} : {payload: EmployeePayload, callback: Callback}) {
   const actions = Array.from([
-    <LoansAndAdvance { ...{ selectedEmployer, callback }  } />,
-    <RequestLoan { ...{ selectedEmployer, callback } } />,
-    <Save4Me { ...{ selectedEmployer, callback } } />
+    <LoansAndAdvance { ...{ payload, callback }  } />,
+    <RequestLoan { ...{ payload, callback } } />,
+    <Save4Me { ...{ payload, callback } } />
   ]);
  
   return (
@@ -50,13 +33,12 @@ export default function Employee({contractData, callback} : {contractData: Emplo
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          pt: { xs: 14, sm: 20 },
-          pb: { xs: 8, sm: 12 },
+          pt: { xs: 4, sm: 10 },
+          pb: { xs: 2, sm: 4 },
         }}
       >
-        <ConnectButton />
+        {/* <ConnectButton /> */}
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
-          <SelectEmployer data={employers} setSelected={setSelected} selected={selectedEmployer.employer} />
           {
             actions.map((action, key) => (
               <React.Fragment key={key}>{ action }</React.Fragment>
