@@ -8,6 +8,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Collapsible } from './Collapsible';
 
 export default function FAQ() {
   const [expanded, setExpanded] = React.useState<string | false>(false);
@@ -42,7 +43,15 @@ export default function FAQ() {
         Frequently asked questions
       </Typography>
       <Box sx={{ width: '100%' }}>
-    
+        <Collapsible
+          title='testing'
+          openOnEntry
+          titleSwitch='switch'
+        >
+          <Box>
+            children
+          </Box>
+        </Collapsible>
       </Box>
     </Container>
   );

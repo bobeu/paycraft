@@ -15,7 +15,11 @@ export default function FilterAPIs({ scrollToSection, isEmployer }: FilterAPIsPr
 
             {
                 isEmployer ? EMPLOYER_APIS_TAGS.map((tag) => (
-                    <MenuItem onClick={() => scrollToSection(tag)} sx={{ py: '6px', px: '12px' }}>
+                    <MenuItem onClick={() => {
+                        let to = tag;
+                        if(tag === "Deactivate") to = "Activate";
+                        scrollToSection(to);
+                    }} sx={{ py: '6px', px: '12px' }}>
                         <Typography variant="body2" color="text.primary">
                             {tag}
                         </Typography>

@@ -7,9 +7,7 @@ import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { AppProps } from "next/app";
 import { http, WagmiProvider, createConfig } from "wagmi";
-import Layout from "../components/AppMain";
 import { celo, celoAlfajores } from "wagmi/chains";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 
@@ -41,20 +39,18 @@ const config = createConfig({
 
 const queryClient = new QueryClient();
 
-
 function App({ Component, pageProps }: AppProps) {
     const [isMounted, setIsMounted] = useState(false);
+    
     useEffect(() => {
         setIsMounted(true);
     }, []);
-    
+
     return (
         isMounted? <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider>
                     <Component {...pageProps} />
-                    {/* <Layout>
-                    </Layout> */}
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider> : null

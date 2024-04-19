@@ -76,12 +76,14 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         }
     }
     
-    function addEmployee(address employee, uint256 payment, uint8 saveForMeRate, uint8 amortizationRate) public returns(bool done) {
+    function addEmployee(address employee, uint256 payment, uint8 saveForMeRate) public returns(bool done) {
         address sender = _msgSender();
         require(employee != address(0), "Addresses is empty");
         if(!isAdded[sender][employee]) {
             isAdded[sender][employee] = true;
-            employees.push(EmployeePayload( employee, sender, employees.length, true, false, payment, saveForMeRate, amortizationRate, AdvanceRequest(0, 0, AdvanceRequestStatus(0)), LoanRequest(0, 0, 0, LoanRequestStatus(0))));
+            employees.push(EmployeePayload( employee, sender, employees.length, true, false, payment, saveForMeRate, 0, AdvanceRequest(0, 0, AdvanceRequestStatus(0)), LoanRequest(0, 0, 0, LoanRequestStatus(0))));
+        } else {
+            revert("Employee exist");
         }
         return done;
     }

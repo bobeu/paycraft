@@ -23,11 +23,6 @@ const addEmployerAbi = [
         "name": "saveForMeRate",
         "type": "uint8"
       },
-      {
-        "internalType": "uint8",
-        "name": "amortizationRate",
-        "type": "uint8"
-      }
     ],
     "name": "addEmployee",
     "outputs": [
@@ -42,15 +37,15 @@ const addEmployerAbi = [
   },
 ] as const;
 
-export async function addEmployee(args: {config: Config, employeeAddr: OxString, payment: bigint, saveForMeRate: number, amortizationRate: number, callback: Callback, account: OxString}) {
-  const { config, employeeAddr, saveForMeRate, callback, amortizationRate, payment, account } = args;
+export async function addEmployee(args: {config: Config, employeeAddr: OxString, payment: bigint, saveForMeRate: number, callback: Callback, account: OxString}) {
+  const { config, employeeAddr, saveForMeRate, callback, payment, account } = args;
   callback({txStatus: "Pending"});
   const { request } = await simulateContract(config, {
     address,
     account,
     abi: addEmployerAbi,
     functionName: "addEmployee",
-    args: [employeeAddr, payment, saveForMeRate, amortizationRate],
+    args: [employeeAddr, payment, saveForMeRate],
   });
   callback({txStatus: "Confirming"});
   const hash = await writeContract(config, request ); 

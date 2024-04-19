@@ -35,12 +35,9 @@ export default function LoansAndAdvance({selectedEmployer : sem, callback} : {se
                 border: "1px solid green",
                 height: "100%"
             }}>
-                <div style={{
-                        marginBottom: '12px',
-                    }}
-                >
+                <div style={{marginBottom: '12px',}}>
                     <Box sx={{display: "flex",justifyContent: "space-between", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Loan</Typography></Button>
+                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Loan</Typography></Button>
                         <Button variant="text" sx={{width: "20%"}}>
                             { LoanStatus[sem.loanReq.status]}
                         </Button>
@@ -78,7 +75,7 @@ export default function LoansAndAdvance({selectedEmployer : sem, callback} : {se
                     }}
                 >
                     <Box sx={{display: "flex",justifyContent: "space-between"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Advance</Typography></Button>
+                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Advance</Typography></Button>
                         <Button variant="text" sx={{width: "20%"}}>
                             { LoanStatus[sem.advanceReq.status]}
                         </Button>

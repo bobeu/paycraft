@@ -15,6 +15,7 @@ import { bn, filterUser, initEmployeePayload,  } from '../utilities';
 import { useAccount } from 'wagmi';
 import { OxString, formatAddr } from '@/contractApis/contractAddress';
 import SelectEmployer from '../SelectEmployer';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Employee({contractData, callback} : {contractData: EmployeePayloads, callback: Callback}) {
   const { address } = useAccount();
@@ -53,6 +54,7 @@ export default function Employee({contractData, callback} : {contractData: Emplo
           pb: { xs: 8, sm: 12 },
         }}
       >
+        <ConnectButton />
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
           <SelectEmployer data={employers} setSelected={setSelected} selected={selectedEmployer.employer} />
           {

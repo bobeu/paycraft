@@ -44,6 +44,6 @@ interface ILoanAndSalaryAdvance {
     function approveLoanOrAdvanceRequest(uint employeeId, uint8 interestRate, uint8 amortizationRate, string memory loanOrAdvanceStr) external returns(bool);
     function requestAdvanceOrLoan(address employerAddr, uint employeeId, uint24 amount, string memory loanOrAdvanceStr) external returns(bool);
     function disableOrEnableEmployee(uint employeeId, bool value) external returns(bool);
-    function addEmployee(address addresses, uint256 payments, uint8 saveForMeRate, uint8 amortizationRate) external returns(bool done);
+    function addEmployee(address addresses, uint256 payments, uint8 saveForMeRate) external returns(bool done);
     
 }

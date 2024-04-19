@@ -31,6 +31,9 @@ export default function Save4Me({selectedEmployer : sem, callback} : {selectedEm
                 border: "1px solid green",
                 height: "100%",
             }}>
+                <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
+                    <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Save4Me</Typography></Button>
+                </Box>
                 <Typography sx={{marginBottom: 2}}><span style={{color: "green", fontSize:"18px"}}>Save4Me</span> allows you to save your earnings with your employer until the next payment or until you disable it. You will earn a compounded interest so long the instruction remains active.</Typography>
                 <div>
                     <Button onClick={async() => await sendRequest(true)} disabled={sem.saveForMe} style={{width: "50%"}}>Enable</Button>

@@ -4,22 +4,17 @@ import Header from "./Header";
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-// import Divider from '@mui/material/Divider';
 import getLPTheme from './getLPTheme';
 import Box from '@mui/material/Box';
-
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Employer from './Employer';
-// import LogoCollection from './LogoCollection';
-// import Highlights from './Highlights';
-// import Pricing from './Pricing';
-// import Features from './Features';
-// import Testimonials from './Testimonials';
 import FAQ from './Faq';
 import Employee from './Employee';
-import { EmployeePayloads } from "@/contractApis/readContract";
+import { Callback, EmployeePayloads, Status, getEmployees } from "@/contractApis/readContract";
 import { initEmployeePayload } from "./utilities";
+import { useAccount, useConfig } from "wagmi";
+import { formatAddr } from "@/contractApis/contractAddress";
 
 
 
@@ -59,8 +54,12 @@ const AppMain = () => {
     const [mode, setMode] = React.useState<PaletteMode>('light');
     const [isEmployer, setShowCustomTheme] = React.useState(true);
     const LPtheme = createTheme(getLPTheme(mode));
-    const [contractData, setData] = React.useState<EmployeePayloads>([initEmployeePayload]);
-    const defaultTheme = createTheme({ palette: { mode } });
+    const [payloads, setData] = React.useState<EmployeePayloads>([initEmployeePayload]);
+    const [txStatus, setStatus] = React.useState<Status>("Pending");
+    // const defaultTheme = createTheme({ palette: { mode } });
+
+    const { isConnected, address } = useAccount();
+    const config = useConfig();
   
     const toggleColorMode = () => {
       setMode((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -70,27 +69,41 @@ const AppMain = () => {
         setShowCustomTheme((prev) => !prev);
     };
 
+    const callback : Callback = (args: {txStatus? : Status, result?: EmployeePayloads}) => {
+      const { txStatus, result } = args; 
+      if(txStatus) setStatus(txStatus);
+      if(result) setData(result);
+    };
+
+    React.useEffect(() => {
+      const controller = new AbortController();
+      if(isConnected) {
+        const readContract = async() => {
+          await getEmployees({
+            config,
+            account: formatAddr(address),
+            callback
+          });
+        }
+        readContract();
+        return () => {
+          controller.abort();
+        }
+      }
+    }, []);
+
     return (
       <ThemeProvider theme={LPtheme}>
-        {/* <CssBaseline /> */}
+        <CssBaseline />
         <Header { ...{ mode, toggleColorMode, isEmployer } } />
-        { 
-          isEmployer? <Employer {...{contractData} } /> : <Employee {...{contractData} } /> 
-        }
+        { isEmployer? <Employer contractData={payloads} {...{callback} } /> : <Employee contractData={payloads} {...{callback} } /> }
         <Box sx={{ bgcolor: 'background.default' }}>
           <FAQ />
           <Footer />
         </Box>
-        {/* <CssBaseline /> */}
         <ToggleCustomTheme { ...{ isEmployer, toggleUsers } } />
       </ThemeProvider>
     );
 };
 
 export default AppMain;
-
-            // <div className="bg-gypsum overflow-hidden flex flex-col min-h-screen">
-            //     <div className=" mx-auto space-y-2 sm:px-6 lg:px-8">
-            //         {/* {children} */}
-            //     </div>
-            // </div>

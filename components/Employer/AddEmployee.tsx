@@ -8,11 +8,10 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
+import { bn, toBigInt } from "../utilities";
 
-export default function AddEmployee({selectedData, callback} : {selectedData: EmployeePayload, callback: Callback}) {
-    // const loanCondition = bn(sem.loanReq.amount).isZero() || (sem.loanReq.status === LoanRequestStatus.NONE || sem.loanReq.status === LoanRequestStatus.SERVICED);
-    // const advanceCondition = bn(sem.advanceReq.amount).isZero() || (sem.advanceReq.status === AdvanceRequestStatus.NONE || sem.advanceReq.status === AdvanceRequestStatus.SERVICED);
-    const [amortizationRate, setRate] = React.useState<string>('0');
+export default function AddEmployee({callback} : {callback: Callback}) {
     const [employee, setAdress] = React.useState<string>(`0x`);
     const [payment, setPayment] = React.useState<string>('0');
     const [saveForMeRate, setSaveForMeRate] = React.useState<string>('0');
@@ -20,44 +19,41 @@ export default function AddEmployee({selectedData, callback} : {selectedData: Em
     const { address, isConnected } = useAccount();
     const config = useConfig();
 
-    const sendRequest = async(value: string) => {
+    const sendRequest = async() => {
         if(!isConnected) return null;
         await addEmployee({
             account: formatAddr(address),
             config,
             callback,
-            amortizationRate,
-            employeeAddrs,
-            payments,
-            saveForMeRate            
-        })
+            // amortizationRate: bn(amortizationRate).toNumber(),
+            employeeAddr: formatAddr(employee),
+            payment: toBigInt(payment),
+            saveForMeRate: bn(saveForMeRate).toNumber()
+        });
     }
 
     return(
-        <section id="Add Employee" >  
+        <section id="Add Employee" >
             <div style={{
-                padding: "22px", 
+                padding: "22px",
                 borderRadius: '6px',
                 border: "1px solid green",
                 height: "100%"
             }}>
-                <div style={{
-                        marginBottom: '12px',
-                    }}
-                >
+                <div style={{marginBottom: '12px',}}>
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Add Employee</Typography></Button>
+                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Add Employee</Typography></Button>
                     </Box>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
-                        <Box sx={{maxHeight: "50px", overflow: "auto"}}>
-                            <Typography >{employee}</Typography>
-                            <Typography >{amortizationRate}</Typography>
+                    <div style={{ display: "flex", flexDirection: "column", gap: '8px',justifyContent: "center", padding: '18px'}}>
+                        <Typography >{employee}</Typography>
+                        <Box sx={{display: 'flex', justifyContent:'space-around'}}>
+                            {/* <Typography >{amortizationRate}</Typography> */}
                             <Typography >{payment}</Typography>
                             <Typography >{saveForMeRate}</Typography>
                         </Box>
-                        <Box sx={{display: "flex", justifyContent: "space-between"}}>
-                            <TextField 
+                        <Stack spacing={3} sx={{ width: '100%' }}>
+                            <TextField
                                 type="text"
                                 placeholder="0x..."
                                 required
@@ -68,92 +64,54 @@ export default function AddEmployee({selectedData, callback} : {selectedData: Em
                                     setAdress(event.currentTarget.value);
                                 }}
                             />
-                            <TextField 
+                            <TextField
                                 type="number"
-                                placeholder="Amount employee will pay in %"
+                                placeholder="Employee salary or wage"
+                                label="Payment"
+                                required
+                                title="Payment"
+                                onChange={(event) => {
+                                    event.preventDefault();
+                                    setPayment(event.currentTarget.value);
+                                }}
+                            />
+                            {/* <TextField
+                                type="number"
+                                placeholder="0"
+                                // required
                                 label="Amortization"
-                                title="Amortization rate"
+                                title="Amortization in %"
                                 onChange={(event) => {
                                     event.preventDefault();
                                     setRate(event.currentTarget.value);
                                 }}
-                            />
-                            <TextField 
-                                type="text"
-                                placeholder="0x..."
-                                required
-                                label="Employee"
-                                title="Enter employee address"
-                                onChange={(event) => {
-                                    event.preventDefault();
-                                    setAdress(event.currentTarget.value);
-                                }}
-                            />
-                            <TextField 
-                                type="text"
-                                placeholder="0x..."
-                                required
-                                label="Employee"
-                                title="Enter employee address"
-                                onChange={(event) => {
-                                    event.preventDefault();
-                                    setAdress(event.currentTarget.value);
-                                }}
-                            />
-                        </Box>
-                    </div>
-                    <div style={{width: "100%"}}>
-                        <Button 
-                            disabled={!loanCondition || loan === '0' || loan === ''} 
-                            size="medium" 
-                            variant="outlined" 
-                            sx={{width: "100%"}}
-                            onClick={async() => await sendRequest("LOAN", loan)}
-                        >
-                            Request
-                        </Button>
-                    </div>
-                </div>
-                <Divider />
-                {/* Advances */}
-                <div style={{
-                        marginTop: '12px',
-                    }}
-                >
-                    <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Request Advance</Typography></Button>
-                    </Box>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
-                        <Button variant="text">{advance}</Button>
-                        <Box sx={{display: "flex", justifyContent: "space-between"}}>
-                            <TextField 
+                            /> */}
+                            <TextField
                                 type="number"
-                                placeholder="500"
-                                required
-                                label="Enter advance amount"
-                                title="Request loan"
+                                placeholder="0"
+                                // required
+                                label="Save4Me"
+                                title="Save4MeRate"
                                 onChange={(event) => {
                                     event.preventDefault();
-                                    setAdvance(event.currentTarget.value);
+                                    setSaveForMeRate(event.currentTarget.value);
                                 }}
                             />
-                        </Box>
-                        
+                        </Stack>
                     </div>
+                    <Divider />
                     <div style={{width: "100%"}}>
-                        <Button 
-                            disabled={!advanceCondition || advance === '0' || advance === ''} 
-                            size="medium" 
-                            variant="outlined" 
+                        <Button
+                            disabled={(!employee || employee === '0x') || (!payment || payment === '0')}
+                            size="medium"
+                            variant="outlined"
                             sx={{width: "100%"}}
-                            onClick={async() => await sendRequest("ADVANCE", advance)}
+                            onClick={sendRequest}
                         >
-                            Request
+                            Add
                         </Button>
                     </div>
                 </div>
-
             </div>
         </section>
     );

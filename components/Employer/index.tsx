@@ -1,35 +1,30 @@
 import * as React from 'react';
 import { alpha } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import Activate from './Activate';
 import AddEmployee from './AddEmployee';
-import Approve from './Approve';
-import Deactivate from './Deactivate';
 import Pay from './Pay';
 import { Callback, EmployeePayload, EmployeePayloads } from '@/contractApis/readContract';
 import { filterUser, initEmployeePayload } from '../utilities';
 import { useAccount } from 'wagmi';
 import { formatAddr } from '@/contractApis/contractAddress';
 import SelectEmployer from '../SelectEmployer';
+import ApproveLoanOrAdvanceRequest from './ApproveLoanOrAdvanceRequest';
 
 export default function Employer({contractData, callback} : {contractData: EmployeePayloads, callback: Callback}) {
-  const [selectedData, setData] = React.useState<EmployeePayload>(initEmployeePayload);
+  // const [selectedData, setData] = React.useState<EmployeePayload>(initEmployeePayload);
   const { address } = useAccount();
   const employees = filterUser(formatAddr(address), contractData, true);
   const [selectedEmployee, setEmployee] = React.useState<EmployeePayload>(initEmployeePayload);
   
   const setSelected = (x: EmployeePayload) => setEmployee(x);
   const actions = Array.from([
-    <AddEmployee { ...{ selectedData, callback } } />,
-    <Activate { ...{ selectedData, callback } } />,
-    <Deactivate { ...{ selectedData, callback } } />,
-    <Pay { ...{ selectedData, callback } } />
+    <AddEmployee { ...{ callback } } />,
+    <Activate { ...{ callback, selectedEmployee } } />,
+    <Pay { ...{ callback, selectedEmployee } } />,
+    <ApproveLoanOrAdvanceRequest { ...{ callback, selectedEmployee } } />
   ]);
 
   return (

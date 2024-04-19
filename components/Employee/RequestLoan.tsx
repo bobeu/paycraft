@@ -40,12 +40,10 @@ export default function RequestLoan({selectedEmployer : sem, callback} : {select
                 border: "1px solid green",
                 height: "100%"
             }}>
-                <div style={{
-                        marginBottom: '12px',
-                    }}
+                <div style={{marginBottom: '12px',}}
                 >
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Request loan</Typography></Button>
+                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Request loan</Typography></Button>
                     </Box>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
@@ -83,7 +81,7 @@ export default function RequestLoan({selectedEmployer : sem, callback} : {select
                     }}
                 >
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "50%"}}><Typography variant="h5">Request Advance</Typography></Button>
+                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Request Advance</Typography></Button>
                     </Box>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
