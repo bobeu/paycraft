@@ -26,9 +26,11 @@ export default function Activate({payload : pl, callback} : {callback: Callback,
     return(
         <section id="Activate">
             <div style={{
-                padding: "22px",
+                padding: "12px",
                 borderRadius: '6px',
-                border: "1px solid green",
+                boxShadow: "0.1em solid #48ff96",
+                borderBottom: "0.7em solid #48ff96",
+                background: "rgba(255, 253, 255, 0.9)",
                 height: "100%"
             }}>
                 <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>

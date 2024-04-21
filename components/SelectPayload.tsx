@@ -11,9 +11,7 @@ import MenuList from '@mui/material/MenuList';
 import { EmployeePayload, EmployeePayloads } from '@/contractApis/readContract';
 import { OxString } from '@/contractApis/contractAddress';
 
-const options = ['Create a merge commit', 'Squash and merge', 'Rebase and merge'];
-
-export default function SelectPayload({filteredPayloads : fp, setSelectedPayload, selectedUser: sp} : {filteredPayloads: EmployeePayloads, setSelectedPayload: (x: EmployeePayload) => void, selectedUser: string}) {
+export default function SelectPayload({filteredPayloads : fp, setSelectedPayload, selectedUser: sp, isEmployer} : {filteredPayloads: EmployeePayloads, setSelectedPayload: (x: EmployeePayload) => void, selectedUser: string, isEmployer: boolean}) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
 
@@ -46,16 +44,27 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
         variant="outlined"
         ref={anchorRef}
         aria-label="Button group with a nested menu"
+        
         // style={{padding: "10px"}}
       >
-        <Button disabled style={{padding: "12px"}} >{sp}</Button>
+        <Button 
+          disabled 
+          startIcon={"Employer: "}
+          endIcon={`${sp.substring(0, 6)}...${sp.substring(36, 42)}`}
+          sx={{
+            width: {xs: "290px", sm: "400px", md: "fit-content"},
+            overflowX: "hidden",
+            height: "100%",
+          }}
+        />
         <Button
-          size="medium"
+          // size="medium"
           aria-controls={open ? 'split-button-menu' : undefined}
           aria-expanded={open ? 'true' : undefined}
           aria-label="select merge strategy"
           aria-haspopup="menu"
           onClick={handleToggle}
+          sx={{height: "100%"}}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -82,10 +91,10 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
                     <MenuItem
                       key={i}
                       // disabled={index === 2}
-                      selected={fp.employer === sp}
+                      selected={isEmployer? fp.employer === sp : fp.identifier === sp}
                       onClick={(event) => handleMenuItemClick(i)}
                     >
-                      {fp.employer}
+                      {isEmployer? `${fp.employer.substring(0, 12)}...${fp.employer.substring(23, 42)}` : `${fp.employer.substring(0, 12)}...${fp.identifier.substring(23, 42)}`}
                     </MenuItem>
                   ))}
                 </MenuList>

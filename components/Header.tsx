@@ -1,5 +1,5 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useConnect } from "wagmi";
+import { useConnect, useAccount } from "wagmi";
 import { injected } from "wagmi/connectors";
 import React, { useEffect, useState} from 'react';
 import { PaletteMode } from '@mui/material';
@@ -28,7 +28,7 @@ import FilterAPIs from "./FilterAPIs";
 
 export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarProps) {
     const [hideConnectBtn, setHideConnectBtn] = useState(false);
-    const { connect } = useConnect();
+    const { isConnected } = useAccount();
 
     const [open, setOpen] = React.useState(false);
 
@@ -50,12 +50,12 @@ export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarP
         }
     };
 
-    useEffect(() => {
-        if (window.ethereum && window.ethereum.isMiniPay) {
-            setHideConnectBtn(true);
-            connect({ connector: injected({ target: "metaMask" }) });
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (window.ethereum && window.ethereum.isMiniPay) {
+    //         setHideConnectBtn(true);
+    //         connect({ connector: injected({ target: "metaMask" }) });
+    //     }
+    // }, []);
 
     return (
         <div>
@@ -95,7 +95,7 @@ export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarP
                         </Box>
                         <Box sx={{width: "100%", display: { sm: 'flex', md: 'none' } }}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                                <ConnectButton />
+                                { isConnected && <ConnectButton />}
                                 <Button
                                     variant="text"
                                     color="primary"

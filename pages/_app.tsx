@@ -10,34 +10,8 @@ import { http, WagmiProvider, createConfig } from "wagmi";
 import { celo, celoAlfajores } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { config, queryClient } from "@/config";
 
-const connectors = connectorsForWallets(
-    [
-        {
-            groupName: "Recommended",
-            wallets: [injectedWallet],
-        },
-    ],
-    {
-        appName: "Celo Composer",
-        projectId: "044601f65212332475a09bc14ceb3c34",
-    }
-);
-
-const config = createConfig({
-    connectors,
-    chains: [celo, celoAlfajores],
-    transports: {
-        [celo.id]: http(),
-        [celoAlfajores.id]: http(),
-    },
-    batch: {
-        multicall: true,
-        
-    }
-});
-
-const queryClient = new QueryClient();
 
 function App({ Component, pageProps }: AppProps) {
     const [isMounted, setIsMounted] = useState(false);

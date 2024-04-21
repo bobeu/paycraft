@@ -1,15 +1,17 @@
 import * as React from 'react';
 import AppMain from '@/components/AppMain';
 import { useAccount, useConnect } from 'wagmi';
-
+import { config, connectors } from '@/config';
+import { connect } from "wagmi/actions";
+import { injected } from "wagmi/connectors";
 export default function Index() {
-  const { address, isConnected, connector } = useAccount();
-  const { connect } = useConnect();
-
+  const { address, isConnected, } = useAccount();
+  // const { connect } = useConnect(config);
+ 
   React.useEffect(() => {
-      if (isConnected && connector) {
-          connect({connector});
-      }
+    if(window.ethereum && window.ethereum.isMinipay && !isConnected){
+      connect(config, { connector: injected()});
+    }
   }, [address, isConnected]);
   
   return (

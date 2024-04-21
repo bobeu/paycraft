@@ -17,8 +17,6 @@ import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 import SelectPayload from "./SelectPayload";
 
-
-
 interface Props {
     children: ReactNode;
 }
