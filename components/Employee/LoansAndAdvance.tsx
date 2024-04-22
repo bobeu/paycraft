@@ -16,40 +16,44 @@ export default function LoansAndAdvance({payload : pl, callback} : {payload: Emp
 
     const sendRequest = async(acceptOrRejectStr: AcceptOrRejectLoan) => {
         if(!isConnected) return null;
-        await acceptOrRejectLoan({
-            account: formatAddr(address),
-            callback,
-            employerAddr: pl.employer,
-            employeeId: pl.workId,
-            acceptOrRejectStr,
-            config
-        });
+        try {
+            await acceptOrRejectLoan({
+                account: formatAddr(address),
+                callback,
+                employerAddr: pl.employer,
+                employeeId: pl.workId,
+                acceptOrRejectStr,
+                config
+            });
+        } catch (error: any) {
+            console.log("Error: ", error?.message || error?.data?.message);
+        }
     }
 
     return(
         <section id="Loans & Advances" >
-            
             <div style={{
                 padding: "22px", 
                 borderRadius: '6px',
-                border: "1px solid green",
+                borderBottom: "0.7rem solid #8ECDDD",
+                background: "#22668D",
                 height: "100%"
             }}>
-                <div style={{marginBottom: '12px',}}>
-                    <Box sx={{display: "flex",justifyContent: "space-between", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Loan</Typography></Button>
-                        <Button variant="text" sx={{width: "20%"}}>
+                <div style={{marginBottom: '12px', color: "white"}}>
+                    <Box sx={{display: "flex",justifyContent: "space-between", alignItems: "center", color: "white"}}>
+                        <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="h6">Loan</Typography></Button>
+                        <Button variant="text" sx={{width: "20%", color: "white"}}>
                             { LoanStatus[pl.loanReq.status]}
                         </Button>
                     </Box>
-                    <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Typography variant="h6">Work Id</Typography>
-                        <Button variant="text" sx={{width: "20%"}}>
-                            { pl.workId.toString()}
-                        </Button>
-                    </Box>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px'}}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px', color: "#8ECDDD"}}>
+                        <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
+                            <Typography variant="body1">Work Id</Typography>
+                            <Button variant="text" sx={{width: "20%"}}>
+                                { pl.workId.toString()}
+                            </Button>
+                        </Box>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Balance</Typography>
                             <Typography>{pl.loanReq.amount.toString()}</Typography>
@@ -64,8 +68,8 @@ export default function LoansAndAdvance({payload : pl, callback} : {payload: Emp
                         </Box>
                     </div>
                     <div style={{width: "100%"}}>
-                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={!loanCondition} size="medium" variant="contained" sx={{width: "50%"}}>Accept</Button>
-                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={!loanCondition} variant="outlined" sx={{width: "50%"}}>Reject</Button>
+                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={!loanCondition} size="medium" variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Accept</Button>
+                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={!loanCondition} variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Reject</Button>
                     </div>
                 </div>
                 <Divider />
@@ -75,12 +79,12 @@ export default function LoansAndAdvance({payload : pl, callback} : {payload: Emp
                     }}
                 >
                     <Box sx={{display: "flex",justifyContent: "space-between"}}>
-                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Advance</Typography></Button>
-                        <Button variant="text" sx={{width: "20%"}}>
+                        <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="h6">Advance</Typography></Button>
+                        <Button variant="text" sx={{width: "20%", color: "white"}}>
                             { LoanStatus[pl.advanceReq.status]}
                         </Button>
                     </Box>
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px'}}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', padding: '18px', color: '#8ECDDD'}}>
                         <Box sx={{display: "flex", justifyContent: "space-between"}}>
                             <Typography>Balance</Typography>
                             <Typography>{pl.advanceReq.amount.toString()}</Typography>
@@ -90,9 +94,9 @@ export default function LoansAndAdvance({payload : pl, callback} : {payload: Emp
                             <Typography>{pl.advanceReq.amortizationAmt.toString()}</Typography>
                         </Box>
                     </div>
-                    <div style={{width: "100%"}}>
-                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={!advanceCondition} size="medium" variant="contained" sx={{width: "50%"}}>Accept</Button>
-                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={!advanceCondition} variant="outlined" sx={{width: "50%"}}>Reject</Button>
+                    <div style={{width: "100%", color: "#22668D"}}>
+                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={!advanceCondition} size="medium" variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Accept</Button>
+                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={!advanceCondition} variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Reject</Button>
                     </div>
                 </div>
             </div>

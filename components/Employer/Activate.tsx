@@ -14,13 +14,17 @@ export default function Activate({payload : pl, callback} : {callback: Callback,
 
     const sendRequest = async(value: boolean) => {
         if(!isConnected) return null;
-        await disableOrEnableEmployee({
-            account: formatAddr(address),
-            callback,
-            employeeId: pl.workId,
-            config,
-            value
-        });
+        try {
+            await disableOrEnableEmployee({
+                account: formatAddr(address),
+                callback,
+                employeeId: pl.workId,
+                config,
+                value
+            });
+        } catch (error: any) {
+            console.log("Error: ", error?.message || error?.data?.message);
+        }
     }
 
     return(
@@ -28,22 +32,28 @@ export default function Activate({payload : pl, callback} : {callback: Callback,
             <div style={{
                 padding: "12px",
                 borderRadius: '6px',
-                boxShadow: "0.1em solid #48ff96",
-                borderBottom: "0.7em solid #48ff96",
-                background: "rgba(255, 253, 255, 0.9)",
+                borderBottom: "0.7rem solid #8ECDDD",
+                background: "#22668D",
                 height: "100%"
             }}>
                 <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
-                    <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Activate Employee</Typography></Button>
-                    <Stack spacing={0} sx={{ width: '100%' }}>
-                        {/* <Typography variant="body2">{pl.identifier}</Typography> */}
-                        <div style={{marginTop: "12px"}}>
-                            <Button onClick={async() => sendRequest(true)} sx={{width: "50%"}} variant="text" disabled={pl.active} >Activate</Button>
-                            <Button onClick={async() => sendRequest(false)} sx={{width: "50%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
-                        </div>
+                    <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Activate Employee</Typography></Button>
+                    <Stack spacing={2} sx={{ width: '100%' }}>
+                        <Button variant="text" style={{width: "100%", color: "#22668D", background: "#FFCC70"}} onClick={async() => sendRequest(true)} sx={{width: "50%"}} disabled={pl.active} >Activate</Button>
+                        <Button  onClick={async() => sendRequest(false)} style={{width: "100%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
                     </Stack>
                 </div>
             </div>
         </section>
     );
 }
+
+
+// 22668D
+// 8ECDDD
+// FFFADD
+// FFCC70
+
+// 070F2B
+// 82C3EC
+// 3A98B9

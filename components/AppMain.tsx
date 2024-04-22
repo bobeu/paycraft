@@ -16,6 +16,7 @@ import { filterUser, initEmployeePayload } from "./utilities";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
 import SelectPayload from "./SelectPayload";
+import Image from "next/image";
 
 interface Props {
     children: ReactNode;
@@ -86,18 +87,23 @@ const AppMain = () => {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    if(isConnected) {
-      const readContract = async() => {
-        await getEmployees({
-          config,
-          account: formatAddr(address),
-          callback
-        });
+    try {
+      
+      if(isConnected) {
+        const readContract = async() => {
+          await getEmployees({
+            config,
+            account: formatAddr(address),
+            callback
+          });
+        }
+        readContract();
+        return () => {
+          controller.abort();
+        }
       }
-      readContract();
-      return () => {
-        controller.abort();
-      }
+    } catch (error: any) {
+      console.log("Error: ", error?.message || error?.data?.message)
     }
   }, [isConnected]);
 
@@ -105,8 +111,13 @@ const AppMain = () => {
     <ThemeProvider theme={LPtheme}>
       <CssBaseline />
       <Header { ...{ mode, toggleColorMode, isEmployer } } />
-      <Box sx={{marginTop: 12, display: "flex", justifyContent: "center", alignItems: "center"}}>
-        <SelectPayload { ...{filteredPayloads, setSelectedPayload}} selectedUser={isEmployer? payload.employer : payload.identifier} />
+      <Box sx={{width: "100%", display: 'flex', justifyContent: "center", alignItems: "center", marginTop: 10}} >
+        {
+          isEmployer? <Image src={"/employer2/2636676.jpg"} width={350} height={350} alt="image by Freepick"/> : <Image src={"/employee/20922.jpg"} width={250} height={250} alt="image by Freepick"/>
+        }
+      </Box>
+      <Box sx={{marginTop: 2, display: "flex", justifyContent: "center", alignItems: "center"}}>
+        <SelectPayload { ...{filteredPayloads, setSelectedPayload, isEmployer}} selectedUser={isEmployer? payload.employer : payload.identifier} />
       </Box>
       <Box sx={{marginY: 0, padding: 2}}>
         { isEmployer? <Employer {...{callback, payload} } /> : <Employee {...{callback, payload} } /> }

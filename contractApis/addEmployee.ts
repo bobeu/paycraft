@@ -40,6 +40,7 @@ const addEmployerAbi = [
 export async function addEmployee(args: {config: Config, employeeAddr: OxString, payment: bigint, saveForMeRate: number, callback: Callback, account: OxString}) {
   const { config, employeeAddr, saveForMeRate, callback, payment, account } = args;
   callback({txStatus: "Pending"});
+  console.log("employeeAddr", employeeAddr)
   const { request } = await simulateContract(config, {
     address,
     account,

@@ -25,6 +25,8 @@ export interface LoanRequest {
     status: LoanRequestStatus;
 }
 
+export type EmployeePayReturnType = Readonly<[bigint, bigint, boolean, boolean]>
+
 export interface EmployeePayload {
     identifier: OxString;
     employer: OxString;
@@ -145,6 +147,43 @@ export const getEmployeeAbi = [
   },
 ] as const;
 
+const employeePayAbi = [
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "employeeId",
+        "type": "uint256"
+      }
+    ],
+    "name": "retrievEmployeePayment",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "payBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "loanBal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isLoan",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isAdvance",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+] as const
+
 export const getEmployees = async(args: {config: WagmiConfig, account: OxString, callback: Callback}) => {
     const { config, account, callback } = args;
     const result = await readContract(config, {
@@ -155,4 +194,17 @@ export const getEmployees = async(args: {config: WagmiConfig, account: OxString,
         address
     });
     callback({result});
+}
+
+export const retrieveEmployeePay = async(args: {config: WagmiConfig, account: OxString, employeeId: bigint, callback: Callback}) => {
+    const { config, account, callback, employeeId } = args;
+    const result :EmployeePayReturnType = await readContract(config, {
+        abi: employeePayAbi,
+        functionName: "retrievEmployeePayment",
+        account,
+        args: [employeeId],
+        address
+    });
+    return result;
+    // callback({employeePaymentReturn: result});
 }

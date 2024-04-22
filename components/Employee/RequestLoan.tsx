@@ -4,8 +4,8 @@ import { AdvanceRequestStatus, Callback, EmployeePayload, LoanOrAdvanceStr, Loan
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import Divider from "@mui/material/Divider";
-import { bn, toBigInt } from "../utilities";
+import Stack from "@mui/material/Stack";
+import { bn, inputStyle, toBigInt } from "../utilities";
 import { requestAdvanceOrLoan } from "@/contractApis/requestAdvanceOrLoan";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
@@ -21,15 +21,19 @@ export default function RequestLoan({payload : pl, callback} : {payload: Employe
 
     const sendRequest = async(loanOrAdvanceStr: LoanOrAdvanceStr, value: string) => {
         if(!isConnected) return null;
-        await requestAdvanceOrLoan({
-            account: formatAddr(address),
-            config,
-            amount: bn(value).toNumber(),
-            callback,
-            employerAddr: pl.employer,
-            employeeId: pl.workId,
-            loanOrAdvanceStr
-        })
+        try {
+            await requestAdvanceOrLoan({
+                account: formatAddr(address),
+                config,
+                amount: bn(value).toNumber(),
+                callback,
+                employerAddr: pl.employer,
+                employeeId: pl.workId,
+                loanOrAdvanceStr
+            })
+        } catch (error: any) {
+            console.log("Error: ", error?.message || error?.data?.message);
+        }
     }
 
     return(
@@ -37,83 +41,80 @@ export default function RequestLoan({payload : pl, callback} : {payload: Employe
             <div style={{
                 padding: "22px", 
                 borderRadius: '6px',
-                border: "1px solid green",
+                borderBottom: "0.7rem solid #8ECDDD",
+                background: "#22668D",
                 height: "100%"
             }}>
                 <div style={{marginBottom: '12px',}}
                 >
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Request loan</Typography></Button>
+                        <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="h6">Request loan</Typography></Button>
                     </Box>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
-                        <Button variant="text">{loan}</Button>
-                        <Box sx={{display: "flex", justifyContent: "space-between"}}>
-                            <TextField 
+                    <Box style={{padding: '12px'}}>
+                        <Stack sx={{width :"100%", display: "flex", justifyContent: "center",alignItems: "center"}}>
+                            <input 
+                                style={inputStyle}
                                 type="number"
                                 placeholder="500"
                                 required
-                                label="Enter loan amount"
-                                title="Request loan"
+                                id="Enter loan amount"
+                                name="Request loan"
                                 onChange={(event) => {
                                     event.preventDefault();
                                     setLoan(event.currentTarget.value);
                                 }}
                             />
-                        </Box>
-                    </div>
-                    <div style={{width: "100%"}}>
-                        <Button 
-                            disabled={!loanCondition || loan === '0' || loan === ''} 
-                            size="medium" 
-                            variant="outlined" 
-                            sx={{width: "100%"}}
-                            onClick={async() => await sendRequest("LOAN", loan)}
-                        >
-                            Request
-                        </Button>
-                    </div>
+                            <Button variant="text">{loan}</Button>
+                            <Button 
+                                disabled={!loanCondition || loan === '0' || loan === ''} 
+                                size="medium" 
+                                variant="contained" 
+                                sx={{width: "100%",  background: "#FFCC70", color: "#22668D"}}
+                                onClick={async() => await sendRequest("LOAN", loan)}
+                            >
+                                Request
+                            </Button>
+                        </Stack>
+                    </Box>
                 </div>
-                <Divider />
+                {/* <Divider /> */}
                 {/* Advances */}
                 <div style={{
                         marginTop: '12px',
                     }}
                 >
                     <Box sx={{display: "flex",justifyContent: "start", alignItems: "center"}}>
-                        <Button variant="outlined" sx={{width: "fit-content"}}><Typography variant="h6">Request Advance</Typography></Button>
+                        <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="h6">Request Advance</Typography></Button>
                     </Box>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: '8px', justifyContent: "center", padding: '18px'}}>
-                        <Button variant="text">{advance}</Button>
-                        <Box sx={{display: "flex", justifyContent: "space-between"}}>
-                            <TextField 
+                    <Box style={{padding: '12px'}}>
+                        <Stack sx={{width :"100%", display: "flex", justifyContent: "center",alignItems: "center"}}>
+                            <input 
+                                style={inputStyle}
                                 type="number"
                                 placeholder="500"
                                 required
-                                label="Enter advance amount"
-                                title="Request loan"
+                                id="Enter advance amount"
+                                name="Request loan"
                                 onChange={(event) => {
                                     event.preventDefault();
                                     setAdvance(event.currentTarget.value);
                                 }}
                             />
-                        </Box>
-                        
-                    </div>
-                    <div style={{width: "100%"}}>
-                        <Button 
-                            disabled={!advanceCondition || advance === '0' || advance === ''} 
-                            size="medium" 
-                            variant="outlined" 
-                            sx={{width: "100%"}}
-                            onClick={async() => await sendRequest("ADVANCE", advance)}
-                        >
-                            Request
-                        </Button>
-                    </div>
+                            <Button variant="text">{advance}</Button>
+                            <Button 
+                                disabled={!advanceCondition || advance === '0' || advance === ''} 
+                                size="medium" 
+                                variant="contained" 
+                                sx={{width: "100%", background: "#FFCC70", color: "#22668D"}}
+                                onClick={async() => await sendRequest("ADVANCE", advance)}
+                            >
+                                Request
+                            </Button>
+                        </Stack>
+                    </Box>
                 </div>
-
             </div>
         </section>
     );

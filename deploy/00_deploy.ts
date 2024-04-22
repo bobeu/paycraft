@@ -5,7 +5,7 @@ import Web3 from "web3";
 import { newKitFromWeb3 } from "@celo/contractkit";
 
 dotconfig();
-const isTestnet = String(process.env.NETWORK) === "testnet";
+const isTestnet = String(process.env.SERVICE_CONTEXT) === "TESTNET";
 let kit;
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, getNamedAccounts} = hre;

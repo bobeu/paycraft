@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import { EmployeePayload, EmployeePayloads } from '@/contractApis/readContract';
 import { OxString } from '@/contractApis/contractAddress';
+import { zeroAddress } from 'viem';
 
 export default function SelectPayload({filteredPayloads : fp, setSelectedPayload, selectedUser: sp, isEmployer} : {filteredPayloads: EmployeePayloads, setSelectedPayload: (x: EmployeePayload) => void, selectedUser: string, isEmployer: boolean}) {
   const [open, setOpen] = React.useState(false);
@@ -49,13 +50,14 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
       >
         <Button 
           disabled 
-          startIcon={"Employer: "}
-          endIcon={`${sp.substring(0, 6)}...${sp.substring(36, 42)}`}
+          startIcon={isEmployer? "My Employees: " : "My Employers: "}
+          endIcon={getPhoneNumber(sp)}
           sx={{
-            width: {xs: "290px", sm: "400px", md: "fit-content"},
+            width: "fit-content",
             overflowX: "hidden",
             height: "100%",
           }}
+          style={{border: "none",}}
         />
         <Button
           // size="medium"
@@ -65,6 +67,7 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
           aria-haspopup="menu"
           onClick={handleToggle}
           sx={{height: "100%"}}
+          style={{border: "none",}}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -84,7 +87,7 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
                 placement === 'bottom' ? 'center top' : 'center bottom',
             }}
           >
-            <Paper>
+            <Paper style={{width : "235px"}}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
                   {fp.map((fp, i) => (
@@ -94,7 +97,8 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
                       selected={isEmployer? fp.employer === sp : fp.identifier === sp}
                       onClick={(event) => handleMenuItemClick(i)}
                     >
-                      {isEmployer? `${fp.employer.substring(0, 12)}...${fp.employer.substring(23, 42)}` : `${fp.employer.substring(0, 12)}...${fp.identifier.substring(23, 42)}`}
+                      {isEmployer? `${getPhoneNumber(fp.employer)}` : `${getPhoneNumber(fp.employer)}`}
+                      {/* {isEmployer? `${fp.employer.substring(0, 12)}...${fp.employer.substring(23, 42)}` : `${fp.employer.substring(0, 12)}...${fp.identifier.substring(23, 42)}`} */}
                     </MenuItem>
                   ))}
                 </MenuList>
@@ -106,3 +110,8 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
     </React.Fragment>
   );
 }
+
+const getPhoneNumber = (address: string) => {
+  if(address === zeroAddress) return "+234...";
+  if(address === "0x813Af3052B521fF0E96576702399a1D5b8C93fCe") return "+2348153014617";
+} 

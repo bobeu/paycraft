@@ -23,7 +23,18 @@ export const initEmployeePayload : EmployeePayload = {
         amortizationAmt: 0n,
         status: 0
     }
+    
 } 
+
+export const inputStyle = {
+    width: "fit-content",
+    borderRadius: "6px",
+    background: "transparent",
+    border: "0.1rem solid #8ECDDD",
+    padding: "8px",
+    
+  }
+    
 export const filterUser = (account: OxString, payloads: EmployeePayloads, isEmployer: boolean) : EmployeePayloads => {
     if(!payloads) return [initEmployeePayload];
     const filtered = payloads.filter((payload) => isEmployer? payload.employer === account : payload.identifier === account);
@@ -36,3 +47,6 @@ export const str = (x: string | undefined) : string => {
 
 export const bn = (x: string | bigint) => BigNumber.from(x);
 export const toBigInt = (x: string | number) => BigNumber.from(x).toBigInt();
+export const powr = (x: number | string, power: number, decimals: number): BigNumber => {
+    return BigNumber.from(x).mul(BigNumber.from(BigNumber.from(10).pow(decimals))).mul(BigNumber.from(power));
+  }
