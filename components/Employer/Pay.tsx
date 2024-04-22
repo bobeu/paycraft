@@ -7,6 +7,10 @@ import { Callback, EmployeePayload } from "@/contractApis/readContract";
 import { useAccount, useConfig } from "wagmi";
 import { sendPayment } from "@/contractApis/sendPayment";
 import { formatAddr } from "@/contractApis/contractAddress";
+import { ethers } from "ethers";
+import { erc20Abi } from "viem";
+import { contractkit } from "@/deploy/00_deploy";
+import { stableTokenABI } from "@celo/abis";
 
 export default function Pay({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
     const { address, isConnected } = useAccount();
@@ -15,15 +19,34 @@ export default function Pay({payload : pl, callback} : {payload: EmployeePayload
 
     const sendRequest = async() => {
         if(!isConnected) return null;
+        const browserProvider = window.ethereum;
+        console.log("Pay", pl.pay.toString());
+        await window.ethereum?.enable()
+        if(browserProvider) {
+            // console.log("Typeof provider", browserProvider);
+            console.log("Address", address);
+            const web3Provider = new ethers.providers.Web3Provider(browserProvider);
+            const signer = await web3Provider.getSigner(address);
+            const cUSD = (await contractkit.contracts.getStableToken()).address;
+            const cUSDContract = new ethers.Contract(cUSD, stableTokenABI, signer);
+            // const bal = await cUSDContract.decimals();
+            // console.log("Bal", bal.toString())
+            // await cUSDContract.approve(pl.identifier, pl.pay);
+            await signer.sendTransaction({
+                from: address,
+                to: pl.identifier,
+                value: 1
+            })
+        }
         
-        await sendPayment({
-            account: formatAddr(address),
-            callback,
-            employeeId: pl.workId,
-            config,
-            acceptSaveForMe,
-            employeeAddr: pl.identifier
-        });
+        // await sendPayment({
+        //     account: formatAddr(address),
+        //     callback,
+        //     employeeId: pl.workId,
+        //     config,
+        //     acceptSaveForMe,
+        //     employeeAddr: pl.identifier
+        // });
         // try {
         // } catch (error: any) {
         //     console.log("Error: ", error?.message || error?.data?.message);

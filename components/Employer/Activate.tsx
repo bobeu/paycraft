@@ -39,8 +39,8 @@ export default function Activate({payload : pl, callback} : {callback: Callback,
                 <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
                     <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Activate Employee</Typography></Button>
                     <Stack spacing={2} sx={{ width: '100%' }}>
-                        <Button variant="text" style={{width: "100%", color: "#22668D", background: "#FFCC70"}} onClick={async() => sendRequest(true)} sx={{width: "50%"}} disabled={pl.active} >Activate</Button>
-                        <Button  onClick={async() => sendRequest(false)} style={{width: "100%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
+                        <Button variant="text" style={{width: "50%", color: "#22668D", background: "#FFCC70"}} onClick={async() => sendRequest(true)} sx={{width: "50%"}} disabled={pl.active} >Activate</Button>
+                        <Button  onClick={async() => sendRequest(false)} style={{width: "50%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
                     </Stack>
                 </div>
             </div>
