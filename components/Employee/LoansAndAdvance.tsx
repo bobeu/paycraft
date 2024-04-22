@@ -95,8 +95,8 @@ export default function LoansAndAdvance({payload : pl, callback} : {payload: Emp
                         </Box>
                     </div>
                     <div style={{width: "100%", color: "#22668D"}}>
-                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={!advanceCondition} size="medium" variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Accept</Button>
-                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={!advanceCondition} variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Reject</Button>
+                        <Button onClick={async() => await sendRequest("ACCEPTED")} disabled={advanceCondition} size="medium" variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Accept</Button>
+                        <Button onClick={async() => await sendRequest("REJECTED")} disabled={advanceCondition} variant="outlined" sx={{width: "50%", background: "#FFCC70"}}>Reject</Button>
                     </div>
                 </div>
             </div>

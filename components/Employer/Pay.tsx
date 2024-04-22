@@ -16,18 +16,18 @@ export default function Pay({payload : pl, callback} : {payload: EmployeePayload
     const sendRequest = async() => {
         if(!isConnected) return null;
         
-        try {
-            await sendPayment({
-                account: formatAddr(address),
-                callback,
-                employeeId: pl.workId,
-                config,
-                acceptSaveForMe,
-                employeeAddr: pl.identifier
-            });
-        } catch (error: any) {
-            console.log("Error: ", error?.message || error?.data?.message);
-        }
+        await sendPayment({
+            account: formatAddr(address),
+            callback,
+            employeeId: pl.workId,
+            config,
+            acceptSaveForMe,
+            employeeAddr: pl.identifier
+        });
+        // try {
+        // } catch (error: any) {
+        //     console.log("Error: ", error?.message || error?.data?.message);
+        // }
     }
 
     return(

@@ -94,10 +94,10 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
                     <MenuItem
                       key={i}
                       // disabled={index === 2}
-                      selected={isEmployer? fp.employer === sp : fp.identifier === sp}
+                      selected={isEmployer? fp.employer === sp : false}
                       onClick={(event) => handleMenuItemClick(i)}
                     >
-                      {isEmployer? `${getPhoneNumber(fp.employer)}` : `${getPhoneNumber(fp.employer)}`}
+                      {isEmployer? `${getPhoneNumber(fp.employer)}` : `${getPhoneNumber(fp.identifier)}`}
                       {/* {isEmployer? `${fp.employer.substring(0, 12)}...${fp.employer.substring(23, 42)}` : `${fp.employer.substring(0, 12)}...${fp.identifier.substring(23, 42)}`} */}
                     </MenuItem>
                   ))}
@@ -113,5 +113,5 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
 
 const getPhoneNumber = (address: string) => {
   if(address === zeroAddress) return "+234...";
-  if(address === "0x813Af3052B521fF0E96576702399a1D5b8C93fCe") return "+2348153014617";
+  if(address === "0x813Af3052B521fF0E96576702399a1D5b8C93fCe" || address === "0x7624269a420c12395B743aCF327A61f91bd23b84") return "+2348153014617";
 } 

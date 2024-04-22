@@ -3,7 +3,7 @@
   "chainId": "44787",
   "contracts": {
     "LoanAndSalaryAdvance": {
-      "address": "0xCc51A924173795a968b91C2791DD976b6a4a2db7",
+      "address": "0xf8B72Ede08230D8e233da24cA90faa7f4C437b97",
       "abi": [
         {
           "inputs": [
@@ -362,40 +362,6 @@
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "employeeId",
-              "type": "uint256"
-            }
-          ],
-          "name": "retrievEmployeePayment",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "payBalance",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanBal",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "isLoan",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "isAdvance",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "address",
               "name": "employerAddr",
               "type": "address"
@@ -424,6 +390,11 @@
         },
         {
           "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "employeeId",
+              "type": "uint256"
+            },
             {
               "internalType": "bool",
               "name": "acceptSaveForMe",

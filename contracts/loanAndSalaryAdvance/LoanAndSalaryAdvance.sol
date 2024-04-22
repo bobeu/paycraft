@@ -55,20 +55,27 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         if(!IERC20(cUSD).transferFrom(from, to, amount)) revert TransferFromFailed();
     }
 
-    function _amortize(EmployeePayload memory pld) internal pure returns(uint payBalance, uint loanBal, bool isLoan, bool isAdvance) {
-        loanBal = pld.loanReq.amount;
+    function _amortize(uint employeeId, EmployeePayload memory pld) internal returns(uint payBalance) {
+        uint loanBal = pld.loanReq.amount;
         if(loanBal > 0) {
-            isLoan = true;
             pld.loanReq.amortizationAmt <= loanBal? 
                 (loanBal -= pld.loanReq.amortizationAmt, payBalance = pld.pay - pld.loanReq.amortizationAmt) : 
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
+            employees[employeeId].loanReq.amount = loanBal;
+            if(loanBal == 0) {
+                employees[employeeId].loanReq.status = LoanRequestStatus.SERVICED;
+            }
         }
 
-        if(pld.advanceReq.amount > 0) {
-            isAdvance = true;
+        loanBal = pld.advanceReq.amount;
+        if(loanBal > 0) {
             pld.advanceReq.amortizationAmt <= loanBal? 
                 (loanBal -= pld.advanceReq.amortizationAmt, payBalance = pld.pay - pld.advanceReq.amortizationAmt) : 
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
+            employees[employeeId].advanceReq.amount = loanBal;
+            if(loanBal == 0) {
+                employees[employeeId].advanceReq.status = AdvanceRequestStatus.SERVICED;
+            }
         }
     }
     
@@ -202,59 +209,29 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
      * 
      * Note: Employers can select the range of empployees to pay. This is done using the { start } and { stop } flags.
      *       These flags neither can exceed the number of employees in storage nor can start eceeds stop.
-     * param employeeId : Id assigned to employee at registration point. It corresponds to their position in the EmployeePayload array.
+     * @param employeeId : Id assigned to employee at registration point. It corresponds to their position in the EmployeePayload array.
      * @param acceptSaveForMe : Employer should specify if they're willing to save for employees by holding their pay in custody until otherwise canceled by the employee. 
      *                          This attracts interests compounded on the principal pay. 
      * Note: Employer should give enough allowance correspond to cUSD balance to cover the expected payment range.
      */
-       function sendPayment(bool acceptSaveForMe) 
+       function sendPayment(uint employeeId, bool acceptSaveForMe) 
         public 
+        validateEmployeeId(employeeId, _msgSender())
         returns(bool) 
     {
         address sender = _msgSender();
-        PendingPayment memory ppy = pendingPayment[sender];
-        require(block.timestamp <= (ppy.callTime + 30 seconds), "Execution expire");
-        (uint pay, uint loanBal, bool isLoan, bool isAdvance) = _amortize(ppy.payload);
-        if(isLoan) {
-            employees[ppy.payload.workId].loanReq.amount = loanBal;
-            if(loanBal == 0) {
-                employees[ppy.payload.workId].loanReq.status = LoanRequestStatus.SERVICED;
-            }
-        }  
-        if(isAdvance) {
-            employees[ppy.payload.workId].advanceReq.amount = loanBal;
-            if(loanBal == 0) {
-                employees[ppy.payload.workId].advanceReq.status = AdvanceRequestStatus.SERVICED;
-            }
+        EmployeePayload memory pld = employees[employeeId]; 
+        uint allowance = IERC20(cUSD).allowance(sender, address(this));
+        uint pay = _amortize(employeeId, pld);
+        require(allowance >= pay, "Not enough balance");
+        if(!pld.saveForMe) {
+            _sendPayment(sender, pld.identifier, pay);
         }
-
-        uint newBal = IERC20(cUSD).balanceOf(ppy.payload.identifier);
-        require(newBal >= (ppy.snapshotBal + pay), "Balance anomally");
-        // if(!ppy.payload.saveForMe) {
-        //     _sendPayment(sender, ppy.payload.identifier, pay);
-        // }
-        if(ppy.payload.saveForMe && acceptSaveForMe) {
-            employees[ppy.payload.workId].pay = (pay + ((pay * ppy.payload.saveForMeRate) / 100));
+        if(pld.saveForMe && acceptSaveForMe) {
+            employees[employeeId].pay = (pay + ((pay * pld.saveForMeRate) / 100));
         }
-
-        return true;
-
-
-        // 
-        // if(loanBal == 0) {
-        //     ;
-        // }
-        // 
         
-    }
-
-    function retrievEmployeePayment(uint employeeId) 
-        public 
-        view
-        validateEmployeeId(employeeId, _msgSender()) 
-        returns(uint payBalance, uint loanBal, bool isLoan, bool isAdvance)
-    {
-        return _amortize(employees[employeeId]);
+        return true;
     }
 
     function preparePayment(uint employeeId) 
@@ -283,25 +260,3 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         return _returnData;
     }
 }
-
-
-
-// function sendPayment(uint employeeId, bool acceptSaveForMe) 
-//         public 
-//         validateEmployeeId(employeeId, _msgSender())
-//         returns(bool) 
-//     {
-//         address sender = _msgSender();
-//         EmployeePayload memory pld = employees[employeeId];
-//         uint allowance = IERC20(cUSD).allowance(sender, address(this));
-//         uint pay = _amortize(employeeId, pld);
-//         require(allowance >= pay, "Not enough balance");
-//         if(!pld.saveForMe) {
-//             _sendPayment(sender, pld.identifier, pay);
-//         }
-//         if(pld.saveForMe && acceptSaveForMe) {
-//             employees[employeeId].pay = (pay + ((pay * pld.saveForMeRate) / 100));
-//         }
-        
-//         return true;
-//     }

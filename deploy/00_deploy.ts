@@ -5,16 +5,16 @@ import Web3 from "web3";
 import { newKitFromWeb3 } from "@celo/contractkit";
 
 dotconfig();
-const isTestnet = String(process.env.SERVICE_CONTEXT) === "TESTNET";
-let kit;
+export const isTestnet = String(process.env.SERVICE_CONTEXT) === "TESTNET";
+const web3 = new Web3(isTestnet? "https://alfajores-forno.celo-testnet.org" : "https://forno.celo.org");
+export const contractkit = newKitFromWeb3(web3);
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const {deployments, getNamedAccounts} = hre;
 	const {deploy, getNetworkName} = deployments;
+  const cUSD = (await contractkit.contracts.getStableToken()).address;
 	const {deployer} = await getNamedAccounts();
-  const web3 = new Web3(isTestnet? "https://alfajores-forno.celo-testnet.org" : "https://forno.celo.org");
-  const kit = newKitFromWeb3(web3);
 
-  const cUSD = (await kit.contracts.getStableToken()).address;
   console.log(`Celo Contract ${isTestnet? "Testnet" : "Mainnet"}`, cUSD); 
 
   const networkName = getNetworkName();

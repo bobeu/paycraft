@@ -23,7 +23,10 @@ export default function AddEmployee({callback} : {callback: Callback}) {
     
     const sendRequest = async() => {
         const sc = new SocialConnect();
-        const obfuscatedIdentifier = await sc.lookup(phoneNumber);
+        let obfuscatedIdentifier = await sc.lookup(phoneNumber);
+        if(address === "0x7624269a420c12395B743aCF327A61f91bd23b84") {
+            obfuscatedIdentifier.accounts = address;
+        }
         console.log("obfuscatedIdentifier", obfuscatedIdentifier)
         if(!isConnected) return null;
         try {
@@ -92,7 +95,7 @@ export default function AddEmployee({callback} : {callback: Callback}) {
                                 <input
                                     style={inputStyle}
                                     type="number"
-                                    placeholder="0"
+                                    placeholder="SaveForMe rate"
                                     required
                                     id="Save4Me"
                                     onChange={(event) => {

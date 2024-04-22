@@ -7,11 +7,10 @@ import { OxString, formatAddr } from "@/contractApis/contractAddress";
 import { ContractKit, newKitFromWeb3, newKit, } from "@celo/contractkit";
 import { FederatedAttestationsWrapper } from "@celo/contractkit/lib/wrappers/FederatedAttestations";
 import { str } from "../utilities";
-import Web3 from "web3";
-import { ethers } from "ethers";
+import { isTestnet, contractkit } from "@/deploy/00_deploy";
 
 // const ONE_CENT_CUSD = parseEther("0.01");
-const isTestnet = process.env.SERVICE_CONTEXT === "TESTNET";
+// const isTestnet = process.env.SERVICE_CONTEXT === "TESTNET";
 // const web3 = new Web3(str(process.env.NEXT_PUBLIC_ALFAJORES_RPC));
 // const web3 = new Web3(isTestnet? str(process.env.NEXT_PUBLIC_ALFAJORES_RPC) : str(process.env.NEXT_PUBLIC_ALFAJORES_RPC));
 const SERVICE_CONTEXT = isTestnet? OdisContextName.ALFAJORES : OdisContextName.MAINNET;
@@ -30,7 +29,7 @@ export class SocialConnect {
     issuer: OxString;
 
     constructor() {
-      // this.kit = newKitFromWeb3();
+      this.kit = contractkit;
       // this.kit = newKit(isTestnet? str(process.env.NEXT_PUBLIC_ALFAJORES_RPC) : str(process.env.NEXT_PUBLIC_ALFAJORES_RPC),);
       this.authSigner = {
         authenticationMethod: OdisUtils.Query.AuthenticationMethod.ENCRYPTION_KEY,
