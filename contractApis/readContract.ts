@@ -10,6 +10,7 @@ export enum AdvanceRequestStatus {NONE, PENDING, DISBURSED, SERVICED}
 export enum LoanRequestStatus {NONE, REQUESTED, RESPONDED, ACCEPTED, SERVICED}
 export type EmployeePayloads = Readonly<EmployeePayload[]>;
 export type Status = "Pending" | "Confirming" | "Confirmed";
+export enum TxType {NONE, LOAN, SALARYPAY};
 
 export type Callback = (args: {txStatus?: Status, result?: EmployeePayloads}) => void;
 export interface AdvanceRequest {

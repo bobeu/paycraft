@@ -26,7 +26,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
     // mapping (address => EmployeePayload[]) public employees;
     mapping (address => mapping (address => bool)) private isAdded;
 
-    mapping (address => PendingPayment) private pendingPayment;
+    mapping (address => PendingPayment) private pendingPayments;
 
     EmployeePayload[] private employees;
 
@@ -63,7 +63,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
             employees[employeeId].loanReq.amount = loanBal;
             if(loanBal == 0) {
-                employees[employeeId].loanReq.status = LoanRequestStatus.SERVICED;
+                employees[employeeId].loanReq.status = LoanStatus.SERVICED;
             }
         }
 
@@ -74,7 +74,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
                     (loanBal -= loanBal, payBalance = pld.pay - loanBal);
             employees[employeeId].advanceReq.amount = loanBal;
             if(loanBal == 0) {
-                employees[employeeId].advanceReq.status = AdvanceRequestStatus.SERVICED;
+                employees[employeeId].advanceReq.status = LoanStatus.SERVICED;
             }
         }
     }
@@ -85,7 +85,7 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         // require(employee != sender, "Employer is the employer");
         if(!isAdded[sender][employee]) {
             isAdded[sender][employee] = true;
-            employees.push(EmployeePayload(employee, sender, employees.length, true, false, payment, saveForMeRate, 0, AdvanceRequest(0, 0, AdvanceRequestStatus(0)), LoanRequest(0, 0, 0, LoanRequestStatus(0))));
+            employees.push(EmployeePayload(employee, sender, employees.length, true, false, payment, saveForMeRate, 0, AdvanceRequest(0, 0, LoanStatus(0)), LoanRequest(0, 0, 0, LoanStatus(0))));
         } else {
             revert("Employee exist");
         }
@@ -118,13 +118,13 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         bool condition;
         uint amount_ = amount * (10 ** IERC20(cUSD).decimals());
         if(_toHash(loanOrAdvanceStr) == ADVANCE_HASH) {
-            condition = pld.advanceReq.status == AdvanceRequestStatus.NONE || pld.advanceReq.status == AdvanceRequestStatus.SERVICED;
+            condition = pld.advanceReq.status == LoanStatus.NONE || pld.advanceReq.status == LoanStatus.SERVICED;
             require(amount_ <= pld.pay, "Advance cannot exceed Salary");
-            employees[employeeId].advanceReq = AdvanceRequest(amount_, 0, AdvanceRequestStatus.PENDING);
+            employees[employeeId].advanceReq = AdvanceRequest(amount_, 0, LoanStatus.REQUESTED);
         } else if(_toHash(loanOrAdvanceStr) == LOAN_HASH) {
-            condition = pld.loanReq.status == LoanRequestStatus.NONE || pld.loanReq.status == LoanRequestStatus.SERVICED;
+            condition = pld.loanReq.status == LoanStatus.NONE || pld.loanReq.status == LoanStatus.SERVICED;
             errorMessage = "You have pending loan request";
-            employees[employeeId].loanReq = LoanRequest(amount_, 0, 0, LoanRequestStatus.REQUESTED);
+            employees[employeeId].loanReq = LoanRequest(amount_, 0, 0, LoanStatus.REQUESTED);
         } else {
             revert(loanOrAdvanceStr);
         }
@@ -133,62 +133,49 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
         return true;
     }
 
-    function approveLoanOrAdvanceRequest(uint employeeId, uint8 interestRate, uint8 amortizationRate, string memory loanOrAdvanceStr, string memory acceptOrRejectStr) 
+    function preparePaymentRequest(uint employeeId, uint8 txType) 
         public 
-        validateEmployeeId(employeeId, _msgSender()) 
+        validateEmployeeId(employeeId, _msgSender())
         returns(bool) 
     {
+        require(txType < 3, "Invalid txn type");
         EmployeePayload memory pld = employees[employeeId];
-        require(pld.active, "Disabled");
-        uint allowance = IERC20(cUSD).allowance(_msgSender(), address(this));
-        uint interest = (pld.loanReq.amount * interestRate) / 100;
-        bytes32 inputHash = _toHash(acceptOrRejectStr);
-        require(inputHash == ACCEPTED_HASH || inputHash == REJECTED_HASH, "Invalid input");
-        // uint amortizationAmt = ((pld.advanceReq.amount + interest) * amortizationRate) / 100;
-        bool isLoan = _toHash(loanOrAdvanceStr) == LOAN_HASH;
-        if(inputHash == ACCEPTED_HASH) {
-            require(isLoan? pld.loanReq.status == LoanRequestStatus.REQUESTED : pld.advanceReq.status == AdvanceRequestStatus.PENDING, "Invalid request");
-            uint amortizationAmt = isLoan? ((allowance + interest) * amortizationRate) / 100 : (allowance * amortizationRate) / 100;
-            require(amortizationAmt <= pld.pay, "Amortization exceeds pay");
-            require(allowance > 0, "Allowance is 0");
-            if(isLoan) {
-                employees[employeeId].loanReq = LoanRequest(
-                    allowance + interest,
-                    interest,
-                    amortizationAmt,
-                    LoanRequestStatus.RESPONDED
-                );
-            } else {
-                employees[employeeId].advanceReq = AdvanceRequest(pld.advanceReq.amount, amortizationAmt, AdvanceRequestStatus.DISBURSED);
-            }
-            _sendPayment(_msgSender(), pld.identifier, allowance);
-        } else {
-            isLoan? delete employees[employeeId].loanReq : delete employees[employeeId].advanceReq; 
-        }
-
+        pendingPayments[_msgSender()] = PendingPayment(
+            employees[employeeId],
+            TxType(txType), 
+            IERC20(cUSD).balanceOf(pld.identifier),
+            uint64(block.timestamp)
+        );
         return true;
     }
 
-    function acceptOrRejectLoanApproval(address employerAddr, uint employeeId, string memory acceptOrRejectStr) 
+    function approveLoanOrAdvanceRequest(uint8 interestRate, uint8 amortizationRate, string memory acceptOrRejectStr) 
         public 
-        validateEmployeeId(employeeId, employerAddr)
         returns(bool) 
     {
-        address sender = _msgSender();
-        EmployeePayload memory emp = employees[employeeId];
-        uint allowance = IERC20(cUSD).allowance(employerAddr, address(this));
-        require(sender == emp.identifier, "UnAuthorized call");
-        if(allowance > 0) {
-            if(_toHash(acceptOrRejectStr) == ACCEPTED_HASH) {
-                employees[employeeId].loanReq.status = LoanRequestStatus.ACCEPTED;
-                _sendPayment(employerAddr, emp.identifier, allowance);
-            } else if(_toHash(acceptOrRejectStr) == REJECTED_HASH) {
-                delete employees[employeeId].loanReq;
+        PendingPayment memory pdp = pendingPayments[_msgSender()];
+        bool isLoan = pdp.payload.loanReq.amount > 0;
+        require(pdp.txType == TxType.LOAN, "Invalid Transaction");
+        require(isLoan? pdp.payload.loanReq.status == LoanStatus.REQUESTED : pdp.payload.advanceReq.status == LoanStatus.REQUESTED, "Invalid request");
+        uint interest = pdp.payload.loanReq.amount > 0? (pdp.payload.loanReq.amount * interestRate) / 100 : 0;
+        if(_toHash(acceptOrRejectStr) == ACCEPTED_HASH) {
+            uint amortizationAmt;
+            require(IERC20(cUSD).balanceOf(pdp.payload.identifier) >= (pdp.snapshotBal + (isLoan? pdp.payload.loanReq.amount : pdp.payload.advanceReq.amount)), "Balances anomally");
+            if(isLoan) {
+                amortizationAmt = ((pdp.payload.loanReq.amount + interest) * amortizationRate) / 100;
+                employees[pdp.payload.workId].loanReq = LoanRequest(
+                    pdp.payload.loanReq.amount + interest,
+                    interest,
+                    amortizationAmt,
+                    LoanStatus.DISBURSED
+                );
             } else {
-                revert (acceptOrRejectStr);
+                amortizationAmt = (pdp.payload.advanceReq.amount * amortizationRate) / 100;
+                employees[pdp.payload.workId].advanceReq = AdvanceRequest(pdp.payload.advanceReq.amount, amortizationAmt, LoanStatus.DISBURSED);
             }
+            require(amortizationAmt <= pdp.payload.pay, "Amortization exceeds pay");
         } else {
-            delete employees[employeeId].loanReq;
+            isLoan? delete employees[pdp.payload.workId].loanReq : delete employees[pdp.payload.workId].advanceReq; 
         }
 
         return true;
@@ -210,53 +197,18 @@ contract LoanAndSalaryAdvance is Context, ILoanAndSalaryAdvance {
     /**@dev Employers pay employees
      * Employees addition are not accepted at this point. 
      * Prior to this call, employer should use { disableOrEnableEmployee } to filter ones that should not be paid
-     * Note: pay() is atomic by context i.e transfer to all employees must pass simultaneously.
-     *      Employers should ensure enough allowance is given to cover the pays.
      * 
-     * Note: Employers can select the range of empployees to pay. This is done using the { start } and { stop } flags.
-     *       These flags neither can exceed the number of employees in storage nor can start eceeds stop.
-     * @param employeeId : Id assigned to employee at registration point. It corresponds to their position in the EmployeePayload array.
-     * @param acceptSaveForMe : Employer should specify if they're willing to save for employees by holding their pay in custody until otherwise canceled by the employee. 
-     *                          This attracts interests compounded on the principal pay. 
-     * Note: Employer should give enough allowance correspond to cUSD balance to cover the expected payment range.
+     * Note: Employer should send an ammount correspond to cUSD balance to cover the expected payment range.
      */
-       function sendPayment(uint employeeId, bool acceptSaveForMe) 
-        public 
-        validateEmployeeId(employeeId, _msgSender())
-        returns(bool) 
+       function confirmPayment() public returns(bool) 
     {
-        address sender = _msgSender();
-        EmployeePayload memory pld = employees[employeeId]; 
-        uint allowance = IERC20(cUSD).allowance(sender, address(this));
-        uint pay = _amortize(employeeId, pld);
-        require(allowance >= pay, "Not enough balance");
-        if(!pld.saveForMe) {
-            _sendPayment(sender, pld.identifier, pay);
+        PendingPayment memory pdp = pendingPayments[_msgSender()];
+        uint pay = _amortize(pdp.payload.workId, pdp.payload);
+        if(!pdp.payload.saveForMe) {
+            require(IERC20(cUSD).balanceOf(pdp.payload.identifier) >= (pdp.snapshotBal + pdp.payload.pay), "Balances anomally"); 
+        } else {
+            employees[pdp.payload.workId].pay = (pay + ((pay * pdp.payload.saveForMeRate) / 100)); 
         }
-        if(pld.saveForMe && acceptSaveForMe) {
-            employees[employeeId].pay = (pay + ((pay * pld.saveForMeRate) / 100));
-        }
-        
-        return true;
-    }
-
-    function preparePayment(uint employeeId) 
-        public 
-        validateEmployeeId(employeeId, _msgSender())
-        returns(bool) 
-    {
-        address sender = _msgSender();
-        EmployeePayload memory pld = employees[employeeId];
-        pendingPayment[sender] = PendingPayment(pld, IERC20(cUSD).balanceOf(pld.identifier), uint64(block.timestamp));
-        // uint allowance = msg.value;
-        // require(allowance >= pay, "Not enough balance");
-        // uint pay = _amortize(employeeId, pld);
-        // if(!pld.saveForMe) {
-        //     _sendPayment(sender, pld.identifier, pay);
-        // }
-        // if(pld.saveForMe && acceptSaveForMe) {
-        //     employees[employeeId].pay = (pay + ((pay * pld.saveForMeRate) / 100));
-        // }
         
         return true;
     }

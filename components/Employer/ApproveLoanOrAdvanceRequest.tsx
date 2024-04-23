@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { AdvanceRequestStatus, Callback, EmployeePayload, LoanOrAdvanceStr, LoanRequestStatus } from "@/contractApis/readContract";
+import { AcceptOrRejectLoan, AdvanceRequestStatus, Callback, EmployeePayload, LoanOrAdvanceStr, LoanRequestStatus, TxType } from "@/contractApis/readContract";
 import { bn, inputStyle } from "../utilities";
 import { useAccount, useConfig } from "wagmi";
 import { approveLoanOrAdvanceRequest } from "@/contractApis/approveLoanOrAdvanceRequest";
@@ -16,8 +16,9 @@ export default function ApproveLoanOrAdvanceRequest({payload : pl, callback} : {
     const [amortizationRate, setRate] = React.useState<string>('0');
     const [interestRate, setInterestRate] = React.useState<string>('0');
 
-    const sendRequest = async(loanOrAdvanceStr: LoanOrAdvanceStr) => {
+    const sendRequest = async(acceptOrRejectStr: AcceptOrRejectLoan, loanOrAdvanceStr: LoanOrAdvanceStr) => {
         if(!isConnected) return null;
+        const isLoan = loanOrAdvanceStr === "LOAN";
         try {
             await approveLoanOrAdvanceRequest({
                 account: formatAddr(address),
@@ -26,7 +27,10 @@ export default function ApproveLoanOrAdvanceRequest({payload : pl, callback} : {
                 config,
                 amortizationRate: bn(amortizationRate).toNumber(),
                 interestRate: bn(interestRate).toNumber(),
-                loanOrAdvanceStr
+                acceptOrRejectStr,
+                amount: isLoan? pl.loanReq.amount : pl.advanceReq.amount,
+                employeeAddr: pl.identifier,
+                txType: TxType.LOAN
             });
         } catch (error: any) {
             console.log("Error: ", error?.message || error?.data?.message);
@@ -107,7 +111,7 @@ export default function ApproveLoanOrAdvanceRequest({payload : pl, callback} : {
                                 sx={{width: {xs: "100%", md: "50%"}, background: "#FFCC70", color: "#22668D"}} 
                                 variant="contained" 
                                 disabled={bn(pl.loanReq.amount).isZero() || !(pl.loanReq.status === LoanRequestStatus.REQUESTED)} 
-                                onClick={async() => sendRequest("LOAN")}
+                                onClick={async() => sendRequest("ACCEPTED", "LOAN")}
                             >
                                 Aprrove loan
                             </Button>
@@ -115,7 +119,7 @@ export default function ApproveLoanOrAdvanceRequest({payload : pl, callback} : {
                                 sx={{width: {xs: "100%", md: "50%"}, background: "#FFCC70", color: "#22668D"}}
                                 variant="contained" 
                                 disabled={bn(pl.advanceReq.amount).isZero() || pl.advanceReq.status === AdvanceRequestStatus.DISBURSED}
-                                onClick={async() => sendRequest("ADVANCE")}
+                                onClick={async() => sendRequest("REJECTED", "ADVANCE")}
                             >
                                 Approve advance
                                 </Button>

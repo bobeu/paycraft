@@ -5,7 +5,7 @@ import Web3 from "web3";
 import { newKitFromWeb3 } from "@celo/contractkit";
 
 dotconfig();
-export const isTestnet = String(process.env.SERVICE_CONTEXT) === "TESTNET";
+export const isTestnet = process.env.NEXT_PUBLIC_SERVICE_CONTEXT === "TESTNET";
 const web3 = new Web3(isTestnet? "https://alfajores-forno.celo-testnet.org" : "https://forno.celo.org");
 export const contractkit = newKitFromWeb3(web3);
 

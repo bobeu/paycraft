@@ -3,7 +3,7 @@
   "chainId": "44787",
   "contracts": {
     "LoanAndSalaryAdvance": {
-      "address": "0xf8B72Ede08230D8e233da24cA90faa7f4C437b97",
+      "address": "0x6C591f4a86730902860ad4295addf3e41100Fa3D",
       "abi": [
         {
           "inputs": [
@@ -77,35 +77,6 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "employerAddr",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "employeeId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "acceptOrRejectStr",
-              "type": "string"
-            }
-          ],
-          "name": "acceptOrRejectLoanApproval",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
               "name": "employee",
               "type": "address"
             },
@@ -134,11 +105,6 @@
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "employeeId",
-              "type": "uint256"
-            },
-            {
               "internalType": "uint8",
               "name": "interestRate",
               "type": "uint8"
@@ -150,7 +116,7 @@
             },
             {
               "internalType": "string",
-              "name": "loanOrAdvanceStr",
+              "name": "acceptOrRejectStr",
               "type": "string"
             }
           ],
@@ -176,6 +142,19 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "confirmPayment",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -261,7 +240,7 @@
                       "type": "uint256"
                     },
                     {
-                      "internalType": "enum ILoanAndSalaryAdvance.AdvanceRequestStatus",
+                      "internalType": "enum ILoanAndSalaryAdvance.LoanStatus",
                       "name": "status",
                       "type": "uint8"
                     }
@@ -288,7 +267,7 @@
                       "type": "uint256"
                     },
                     {
-                      "internalType": "enum ILoanAndSalaryAdvance.LoanRequestStatus",
+                      "internalType": "enum ILoanAndSalaryAdvance.LoanStatus",
                       "name": "status",
                       "type": "uint8"
                     }
@@ -312,9 +291,14 @@
               "internalType": "uint256",
               "name": "employeeId",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "txType",
+              "type": "uint8"
             }
           ],
-          "name": "preparePayment",
+          "name": "preparePaymentRequest",
           "outputs": [
             {
               "internalType": "bool",
@@ -378,30 +362,6 @@
             }
           ],
           "name": "save4Me",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "employeeId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "acceptSaveForMe",
-              "type": "bool"
-            }
-          ],
-          "name": "sendPayment",
           "outputs": [
             {
               "internalType": "bool",

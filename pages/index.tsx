@@ -7,6 +7,11 @@ import { injected } from "wagmi/connectors";
 export default function Index() {
   const { address, isConnected, } = useAccount();
   // const { connect } = useConnect(config);
+
+  // let walletClient = createWalletClient({
+  //   transport: custom(window.ethereum),
+  //   chain: celoAlfajores,
+  // });
  
   React.useEffect(() => {
     if(window.ethereum && window.ethereum.isMinipay && !isConnected){
