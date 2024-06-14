@@ -105,7 +105,7 @@ const AppMain = () => {
     } catch (error: any) {
       console.log("Error: ", error?.message || error?.data?.message)
     }
-  }, [isConnected]);
+  }, [isConnected, address, config]);
 
   return (
     <ThemeProvider theme={LPtheme}>

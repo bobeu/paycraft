@@ -10,11 +10,20 @@ import {  Callback, EmployeePayload } from '@/contractApis/readContract';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Employee({payload, callback} : {payload: EmployeePayload, callback: Callback}) {
-  const actions = Array.from([
-    <LoansAndAdvance { ...{ payload, callback }  } />,
-    <RequestLoan { ...{ payload, callback } } />,
-    <Save4Me { ...{ payload, callback } } />
-  ]);
+  const actions = [
+    {
+      id: 0,
+      element: <LoansAndAdvance { ...{ payload, callback }  } />,
+    },
+    {
+      id: 1,
+      element: <RequestLoan { ...{ payload, callback } } />,
+    },
+    {
+      id: 2,
+      element: <Save4Me { ...{ payload, callback } } />,
+    }
+  ];
  
   return (
     <Box
@@ -40,8 +49,8 @@ export default function Employee({payload, callback} : {payload: EmployeePayload
         {/* <ConnectButton /> */}
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
           {
-            actions.map((action, key) => (
-              <React.Fragment key={key}>{ action }</React.Fragment>
+            actions.map(({element, id}) => (
+              <React.Fragment key={id}>{ element }</React.Fragment>
             ))
           }
         </Stack>

@@ -1,6 +1,5 @@
 import { WalletClient } from "viem";
 // import { federatedAttestationsABI, odisPaymentsABI, stableTokenABI, } from "@celo/abis";
-// import { getContract } from "viem";
 import { OdisUtils } from "@celo/identity";
 import { AuthSigner, OdisContextName, ServiceContext, } from "@celo/identity/lib/odis/query";
 import { OxString, formatAddr } from "@/contractApis/contractAddress";
@@ -9,10 +8,6 @@ import { FederatedAttestationsWrapper } from "@celo/contractkit/lib/wrappers/Fed
 import { str } from "../utilities";
 import { isTestnet, contractkit } from "@/deploy/00_deploy";
 
-// const ONE_CENT_CUSD = parseEther("0.01");
-// const isTestnet = process.env.SERVICE_CONTEXT === "TESTNET";
-// const web3 = new Web3(str(process.env.NEXT_PUBLIC_ALFAJORES_RPC));
-// const web3 = new Web3(isTestnet? str(process.env.NEXT_PUBLIC_ALFAJORES_RPC) : str(process.env.NEXT_PUBLIC_ALFAJORES_RPC));
 const SERVICE_CONTEXT = isTestnet? OdisContextName.ALFAJORES : OdisContextName.MAINNET;
 const ISSUER = isTestnet? process.env.NEXT_PUBLIC_MINIPAY_ISSUER_TESTNET : process.env.NEXT_PUBLIC_MINIPAY_ISSUER_MAINNET;
 

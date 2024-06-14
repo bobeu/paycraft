@@ -15,7 +15,7 @@ export default function FilterAPIs({ scrollToSection, isEmployer }: FilterAPIsPr
 
             {
                 isEmployer ? EMPLOYER_APIS_TAGS.map((tag) => (
-                    <MenuItem onClick={() => {
+                    <MenuItem key={tag} onClick={() => {
                         let to = tag;
                         if(tag === "Deactivate") to = "Activate";
                         scrollToSection(to);
@@ -25,7 +25,7 @@ export default function FilterAPIs({ scrollToSection, isEmployer }: FilterAPIsPr
                         </Typography>
                     </MenuItem>
                 )) : EMPLOYEES_APIS_TAGS.map((tag) => (
-                    <MenuItem onClick={() => scrollToSection(tag)} sx={{ py: '6px', px: '12px' }}>
+                    <MenuItem key={tag} onClick={() => scrollToSection(tag)} sx={{ py: '6px', px: '12px' }}>
                         <Typography variant="body2" color="text.primary">
                             {tag}
                         </Typography>

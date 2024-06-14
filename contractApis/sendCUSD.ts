@@ -15,7 +15,7 @@ export default async function sendCUSD(to: string, amount: bigint) {
         transport: custom(window.ethereum),
         chain: isTestnet? celoAlfajores : celo,
     });
-    console.log("isTestnet", isTestnet);
+    // console.log("isTestnet", isTestnet);
     const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
     let [address] = await walletClient.getAddresses();
     console.log("Address", address);

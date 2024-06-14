@@ -10,12 +10,24 @@ import { Callback, EmployeePayload } from '@/contractApis/readContract';
 import ApproveLoanOrAdvanceRequest from './ApproveLoanOrAdvanceRequest';
 
 export default function Employer({payload, callback} : {payload: EmployeePayload, callback: Callback}) {
-  const actions = Array.from([
-    <AddEmployee { ...{ callback } } />,
-    <Activate { ...{ callback, payload } } />,
-    <Pay { ...{ callback, payload } } />,
-    <ApproveLoanOrAdvanceRequest { ...{ callback, payload } } />
-  ]);
+  const actions = [
+    {
+      id: 0,
+      element: <AddEmployee { ...{ callback } } />,
+    },
+    {
+      id: 1,
+      element: <Activate { ...{ callback, payload } } />,
+    },
+    {
+      id: 2,
+      element: <Pay { ...{ callback, payload } } />,
+    },
+    {
+      id: 3,
+      element: <ApproveLoanOrAdvanceRequest { ...{ callback, payload } } />
+    }
+  ];
 
   return (
     <Box
@@ -40,8 +52,8 @@ export default function Employer({payload, callback} : {payload: EmployeePayload
       >
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
           {
-            actions.map((action, key) => (
-              <React.Fragment key={key}>{ action }</React.Fragment>
+            actions.map(({element, id}) => (
+              <React.Fragment key={id}>{ element }</React.Fragment>
             ))
           }
         </Stack>

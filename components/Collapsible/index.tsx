@@ -32,7 +32,7 @@ export const Collapsible = (props: CollapsibleProps) => {
 
   React.useEffect(() => {
     openOnEntry && setOpen(openOnEntry);
-  }, []);
+  }, [openOnEntry]);
 
   return (
     <React.Fragment>
