@@ -3,6 +3,7 @@ import { EmployeePayloads, EmployeePayload } from "@/contractApis/readContract";
 import { BigNumber } from "ethers";
 import { zeroAddress } from "viem";
 
+export const INPUT_CLASSNAME = 'w-full rounded p-2 bg- text-wood';
 export const initEmployeePayload : EmployeePayload = {
     identifier: zeroAddress,
     employer: zeroAddress,

@@ -21,12 +21,12 @@ import FilterAPIs from "./FilterAPIs";
 //   };
   
   interface AppAppBarProps {
-    mode: PaletteMode;
+    // mode: PaletteMode;
     isEmployer: boolean;
-    toggleColorMode: () => void;
+    // toggleColorMode: () => void;
   }
 
-export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarProps) {
+export default function Header({ isEmployer }: AppAppBarProps) {
     const [hideConnectBtn, setHideConnectBtn] = useState(false);
     const { isConnected } = useAccount();
 
@@ -58,69 +58,65 @@ export default function Header({ mode, toggleColorMode, isEmployer }: AppAppBarP
     // }, []);
 
     return (
-        <div>
-            <AppBar position="fixed" sx={{ boxShadow: 0, bgcolor: 'transparent', backgroundImage: 'none', mt: 2, }}>
-                <Container maxWidth="lg">
-                    <Toolbar
-                        variant="regular"
-                        sx={(theme) => ({
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexShrink: 0,
-                        borderRadius: '999px',
-                        bgcolor:
-                            theme.palette.mode === 'light'
-                            ? 'rgba(255, 255, 255, 0.4)'
-                            : 'rgba(0, 0, 0, 0.4)',
-                        backdropFilter: 'blur(24px)',
-                        maxHeight: 40,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        boxShadow:
-                            theme.palette.mode === 'light'
-                            ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
-                            : '0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)',
-                        })}
-                    >
-                        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: '-18px', px: 0, }} >
-                            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                                <FilterAPIs { ...{ isEmployer, scrollToSection }} />
-                            </Box>
-                        </Box>
+        <AppBar position="sticky" sx={{ boxShadow: 0, bgcolor: 'transparent', backgroundImage: 'none', mt: 2, }}>
+            <Toolbar
+                variant="regular"
+                disableGutters
+                sx={(theme) => ({
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexShrink: 0,
+                borderRadius: '999px',
+                bgcolor:
+                    theme.palette.mode === 'light'
+                    ? 'rgba(255, 255, 255, 0.4)'
+                    : 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(24px)',
+                maxHeight: 40,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow:
+                    theme.palette.mode === 'light'
+                    ? `0 0 1px rgba(85, 166, 246, 0.1), 1px 1.5px 2px -1px rgba(85, 166, 246, 0.15), 4px 4px 12px -2.5px rgba(85, 166, 246, 0.15)`
+                    : '0 0 1px rgba(2, 31, 59, 0.7), 1px 1.5px 2px -1px rgba(2, 31, 59, 0.65), 4px 4px 12px -2.5px rgba(2, 31, 59, 0.65)',
+                })}
+            >
+                <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', ml: '-18px', px: 0, }} >
+                    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                        <FilterAPIs { ...{ isEmployer, scrollToSection }} />
+                    </Box>
+                </Box>
 
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, alignItems: 'center', }} >
-                            <ConnectButton />
-                            <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
-                        </Box>
-                        <Box sx={{width: "100%", display: { sm: 'flex', md: 'none' } }}>
-                            <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                                { isConnected && <ConnectButton />}
-                                <Button
-                                    variant="text"
-                                    color="primary"
-                                    aria-label="menu"
-                                    onClick={toggleDrawer(true)}
-                                    sx={{ minWidth: '30px', p: '4px' }}
-                                >
-                                    <MenuIcon />
-                                </Button>
-
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, alignItems: 'center', }} >
+                    <ConnectButton />
+                    {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
+                </Box>
+                <Box sx={{width: "100%", display: { sm: 'flex', md: 'none' } }}>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+                        { isConnected && <ConnectButton />}
+                        <Button
+                            variant="text"
+                            color="primary"
+                            aria-label="menu"
+                            onClick={toggleDrawer(true)}
+                            sx={{ minWidth: '30px', p: '4px' }}
+                        >
+                            <MenuIcon />
+                        </Button>
+                    </Box>
+                    <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+                        <Box sx={{ minWidth: '60dvw', p: 2, backgroundColor: 'background.paper', flexGrow: 1, }} >
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end', flexGrow: 1, }} >
+                                {/* <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} /> */}
                             </Box>
-                            <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-                                <Box sx={{ minWidth: '60dvw', p: 2, backgroundColor: 'background.paper', flexGrow: 1, }} >
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'end', flexGrow: 1, }} >
-                                        <ToggleColorMode mode={mode} toggleColorMode={toggleColorMode} />
-                                    </Box>
-                                    <FilterAPIs { ...{ isEmployer, scrollToSection }} />
-                                    <Divider />
-                                </Box>
-                            </Drawer>
+                            <FilterAPIs { ...{ isEmployer, scrollToSection }} />
+                            <Divider />
                         </Box>
-                    </Toolbar>
-                </Container>
-            </AppBar>
-        </div>
+                    </Drawer>
+                </Box>
+            </Toolbar>
+        </AppBar>
     );
 }
 

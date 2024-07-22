@@ -74,7 +74,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" mt={1}>
       {'Copyright © '}
-      <Link href="https://mui.com/">Soullibz&nbsp;</Link>
+      <Link href="https://mui.com/">Paycraft&nbsp;</Link>
       {new Date().getFullYear()}
     </Typography>
   );
@@ -82,7 +82,7 @@ function Copyright() {
 
 export default function Footer() {
   return (
-    <Container
+    <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -268,6 +268,6 @@ export default function Footer() {
           </IconButton>
         </Stack>
       </Box>
-    </Container>
+    </Box>
   );
 }

@@ -6,10 +6,12 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "outDir": "dist",
+    // "outDir": "dist",
     "esModuleInterop": true,
-    "module": "commonjs",
+    // "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
+    // "moduleResolution": "bundler",
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -27,6 +29,6 @@
     },
   },
   "files": ["./hardhat.config.ts"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "tailwind.config.js"],
   "exclude": ["node_modules"]
 }

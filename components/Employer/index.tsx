@@ -31,17 +31,17 @@ export default function Employer({payload, callback} : {payload: EmployeePayload
 
   return (
     <Box
-      sx={(theme) => ({
-        width: '100%',
-        backgroundImage:
-          theme.palette.mode === 'light'
-            ? 'linear-gradient(180deg, #CEE5FD, #FFF)'
-            : `linear-gradient(#02294F, ${alpha('#090E10', 0.0)})`,
-        backgroundSize: '100% 20%',
-        backgroundRepeat: 'no-repeat',
-      })}
+      // sx={(theme) => ({
+      //   width: '100%',
+      //   backgroundImage:
+      //     theme.palette.mode === 'light'
+      //       ? 'linear-gradient(180deg, #CEE5FD, #FFF)'
+      //       : `linear-gradient(#02294F, ${alpha('#090E10', 0.0)})`,
+      //   backgroundSize: '100% 20%',
+      //   backgroundRepeat: 'no-repeat',
+      // })}
     >
-      <Container
+      {/* <Container
         sx={{
           display: 'flex',
           flexDirection: 'column',
@@ -49,7 +49,7 @@ export default function Employer({payload, callback} : {payload: EmployeePayload
           pt: { xs: 2, sm: 4 },
           pb: { xs: 6, sm: 4 },
         }}
-      >
+      > */}
         <Stack spacing={2} useFlexGap sx={{ width: '100%' }}>
           {
             actions.map(({element, id}) => (
@@ -57,7 +57,7 @@ export default function Employer({payload, callback} : {payload: EmployeePayload
             ))
           }
         </Stack>
-      </Container>
+      {/* </Container> */}
     </Box>
   );
 }

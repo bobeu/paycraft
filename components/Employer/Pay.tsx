@@ -7,12 +7,14 @@ import { Callback, EmployeePayload } from "@/contractApis/readContract";
 import { useAccount, useConfig } from "wagmi";
 import { confirmPayment } from "@/contractApis/confirmPayment";
 import { formatAddr } from "@/contractApis/contractAddress";
+import { SectionButton, SectionContainer } from "../common/SectionContainer";
 
 export default function Pay({payload : pl, callback} : {payload: EmployeePayload, callback: Callback}) {
     const { address, isConnected } = useAccount();
     const config = useConfig();
     const [acceptSaveForMe, setSave4Me] = React.useState<boolean>(false);
 
+    const handleClick = async() => setSave4Me((prev) => !prev);
     const sendRequest = async() => {
         if(!isConnected) return null;
         await confirmPayment({
@@ -31,36 +33,39 @@ export default function Pay({payload : pl, callback} : {payload: EmployeePayload
     }
 
     return(
-        <section id="Pay">
-            <div style={{
-                padding: "22px",
-                borderRadius: '6px',
-                background: "#22668D",
-                borderBottom: "0.7rem solid #8ECDDD",
-                height: "100%"
-            }}>
-                <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
-                    <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Pay</Typography></Button>
-                    <Stack spacing={3} sx={{ width: '100%' }}>
-                        {/* <Typography variant="body2">{pl.identifier}</Typography> */}
-                        <Box sx={{display: "flex", justifyContent: 'space-between', alignItems: "center", color: "#8ECDDD"}}>
-                            <Typography variant="body1">{"Salary/Wage"}</Typography>
-                            <Typography variant="body2">{pl.pay.toString()}</Typography>
-                        </Box>
-                        <Box style={{marginTop: "12px", float: "right", color: "#8ECDDD"}}>
-                            <Typography variant="body2">Accept save4Me <span style={{fontWeight: "bold", fontSize: "12px", color: "cyan"}}>{"(Default is false)"}</span></Typography>
-                            <Button variant="outlined" onClick={() => setSave4Me((prev) => !prev)} sx={{width: "20%", color: "#8ECDDD"}}>{`${acceptSaveForMe? "Accepted" : "Accept"}`}</Button>
-                        </Box>
-                        <Box style={{marginTop: "12px"}}>
-                            <Button onClick={sendRequest} sx={{width: "100%", color: "#22668D", bgcolor: "#FFCC70"}} variant="text" >Pay</Button>
-                            {/* <Button onClick={approve} sx={{width: "50%"}} variant="text" >Unlock</Button> */}
-                        </Box>
-                    </Stack>
+        <SectionContainer sectionId='Pay' title='Pay'>
+            <Stack className='place-items-start p-4 text-white space-y-4'>
+                <div className='w-full flex justify-between items-center'>
+                    <Typography>{"Salary due"}</Typography>
+                    <Typography>{pl.pay.toString()}</Typography>
                 </div>
-            </div>
-        </section>
+                <div className='bg-white text-wood text-xs font-semibold space-y-2 rounded p-2'>
+                    <h3 className='text-pretty'>Do you wish to accept <span className='italic font-serif'>SaveForMe</span> {'from this individual?'}</h3>
+                    <SectionButton buttonText={`${acceptSaveForMe? "Accepted" : "Accept"}`} handleClick={handleClick} disableButton={false}/>
+                </div>
+                <SectionButton disableButton={false} buttonText="Pay" handleClick={sendRequest}/>
+                {/* <div style={{marginTop: "12px"}}> */}
+                    {/* <Button onClick={sendRequest} sx={{width: "100%", color: "#22668D", bgcolor: "#FFCC70"}} variant="text" >Pay</Button> */}
+                    {/* <Button onClick={approve} sx={{width: "50%"}} variant="text" >Unlock</Button> */}
+                {/* </div> */}
+            </Stack>
+        </SectionContainer>
     );
 }
 
+        // <section id="Pay">
+        //     <div style={{
+        //         padding: "22px",
+        //         borderRadius: '6px',
+        //         background: "#22668D",
+        //         borderBottom: "0.7rem solid #8ECDDD",
+        //         height: "100%"
+        //     }}>
+        //         <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
+        //             <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Pay</Typography></Button>
+                    
+        //         </div>
+        //     </div>
+        // </section>
 
 

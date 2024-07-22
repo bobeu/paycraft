@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
@@ -40,12 +41,12 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
   };
 
   return (
-    <React.Fragment>
+    <Box className='border rounded'>
       <ButtonGroup
-        variant="outlined"
+        variant="text"
         ref={anchorRef}
         aria-label="Button group with a nested menu"
-        
+        sx={{width: '100%'}}
         // style={{padding: "10px"}}
       >
         <Button 
@@ -53,11 +54,11 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
           startIcon={isEmployer? "My Employees: " : "My Employers: "}
           endIcon={getPhoneNumber(sp)}
           sx={{
-            width: "fit-content",
+            width: "100%",
             overflowX: "hidden",
             height: "100%",
           }}
-          style={{border: "none",}}
+          // style={{border: "none",}}
         />
         <Button
           // size="medium"
@@ -67,7 +68,7 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
           aria-haspopup="menu"
           onClick={handleToggle}
           sx={{height: "100%"}}
-          style={{border: "none",}}
+          // style={{border: "none",}}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -107,7 +108,7 @@ export default function SelectPayload({filteredPayloads : fp, setSelectedPayload
           </Grow>
         )}
       </Popper>
-    </React.Fragment>
+    </Box>
   );
 }
 

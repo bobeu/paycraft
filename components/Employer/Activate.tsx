@@ -7,6 +7,7 @@ import { Callback, EmployeePayload } from "@/contractApis/readContract";
 import { disableOrEnableEmployee } from "@/contractApis/disableOrEnableEmployee";
 import { useAccount, useConfig } from "wagmi";
 import { formatAddr } from "@/contractApis/contractAddress";
+import { SectionButton, SectionContainer } from "../common/SectionContainer";
 
 export default function Activate({payload : pl, callback} : {callback: Callback, payload: EmployeePayload}) {
     const { address, isConnected } = useAccount();
@@ -28,27 +29,33 @@ export default function Activate({payload : pl, callback} : {callback: Callback,
     }
 
     return(
-        <section id="Activate">
-            <div style={{
-                padding: "12px",
-                borderRadius: '6px',
-                borderBottom: "0.7rem solid #8ECDDD",
-                background: "#22668D",
-                height: "100%"
-            }}>
-                <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
-                    <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Activate Employee</Typography></Button>
-                    <Stack spacing={2} sx={{ width: '100%' }}>
-                        <Button variant="text" style={{width: "50%", color: "#22668D", background: "#FFCC70"}} onClick={async() => sendRequest(true)} sx={{width: "50%"}} disabled={pl.active} >Activate</Button>
-                        <Button  onClick={async() => sendRequest(false)} style={{width: "50%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
-                    </Stack>
-                </div>
-            </div>
-        </section>
+        <SectionContainer sectionId='Activate' title='Status'>
+            <Stack className='place-items-start p-4 text-white space-y-4'>
+                <Typography>{`Employee is ${pl.active? 'active' : 'inactive'}`}</Typography>
+                <SectionButton buttonText={`${pl.active? 'Deactivate' : 'Activate'}`} handleClick={async() => sendRequest(false)} disableButton={!pl.active}/>
+            </Stack>
+        </SectionContainer>
     );
 }
 
 
+        // <section id="Activate">
+        //     <div style={{
+        //         padding: "12px",
+        //         borderRadius: '6px',
+        //         borderBottom: "0.7rem solid #8ECDDD",
+        //         background: "#22668D",
+        //         height: "100%"
+        //     }}>
+        //         <div style={{display: "flex", flexDirection: 'column', gap: "22px"}}>
+        //             <Button variant="text" sx={{width: "fit-content", color: "white"}}><Typography variant="body2">Activate Employee</Typography></Button>
+                    // <Stack spacing={2} sx={{ width: '100%' }}>
+                    //     <Button variant="text" style={{width: "50%", color: "#22668D", background: "#FFCC70"}} onClick={async() => sendRequest(true)} sx={{width: "50%"}} disabled={pl.active} >Activate</Button>
+                    //     <Button  onClick={async() => sendRequest(false)} style={{width: "50%"}} variant="text" disabled={!pl.active} >Deactivate</Button>
+                    // </Stack>
+        //         </div>
+        //     </div>
+        // </section>
 // 22668D
 // 8ECDDD
 // FFFADD
